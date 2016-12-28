@@ -1,7 +1,7 @@
 import os
 from setuptools import setup, find_packages
 
-version = '3.1.12'
+version = '3.1.13'
 
 
 def read(*rnames):
@@ -34,7 +34,7 @@ setup(name='bika.lims',
       author_email='support@bikalabs.com',
       maintainer='Naralabs',
       maintainer_email='info@naralabs.com',
-      url='www.bikalims.org',
+      url='http://www.bikalims.org',
       license='AGPL',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['bika'],
