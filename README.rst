@@ -1,7 +1,8 @@
 Bika LIMS
 =========
 
-v3.1.13 (2016-12-15)
+v3.1.14 (2017-05-26)
+
 
 The meaning of Gaob
 -------------------
@@ -13,7 +14,7 @@ language of the world's first people.
 Installation
 ------------
 
-* `Installing Bika LIMS <https://github.com/bikalabs/bika.lims/wiki/Bika-LIMS-Installation>`_
+* `Installation Manual <https://github.com/bikalabs/bika.lims/wiki/Bika-LIMS-Installation>`_
 
 Documentation
 -------------

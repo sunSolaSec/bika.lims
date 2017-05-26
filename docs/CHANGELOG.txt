@@ -1,15 +1,19 @@
+3.1.14 (2017-05-26)
+-------------------
+Pinned Plone version to 4.3.11
+
 3.1.13 (2016-12-28)
------------------------------
+-------------------
 LIMS-2299: Add ui for editing ar_count in all analysisrequest lists
 - Removed commented HTML that was causing Chameleon to choke when adding ARs.
 
 3.1.12 (2016-12-15)
------------------------------
+-------------------
 HEALTH-569 Bar code printing not working on sample registration
 - Pinned CairoSVG to 1.0.20 (support for Python 2 removed in later versions)
 
 3.1.11 (2016-04-22)
------------------------------
+-------------------
 LIMS-2252: Partitions not submitted when creating AR if the form is submitted before partitions are calculated
 LIMS-2223: Saving a recordswidget as hidden fails
 LIMS-2225: Formatted results not displayed properly in Worksheet's transposed layout
@@ -38,6 +42,7 @@ WINE-125: Client users receive unauthorized when viewing some published ARs
 -------------------
 - Updated Plone to 4.3.7
 - Dashboard: replace multi-bar charts by stacked-bar charts
+
 LIMS-2177: template_set error when no template has been selected
 HEALTH-410: AR Create. Auto-complete Contact field if only 1
 LIMS-2175: "NaN" is shown automatically for result fields that have AS with "LDL" enabled and then an error is shown after submitting a result
@@ -90,7 +95,7 @@ LIMS-1521: Date verified column for AR lists
 LIMS-2015: Column spacing on Client look-up
 
 3.1.9 (2015-10-8)
-------------------
+-----------------
 LIMS-2068: LIMS-2068 Urgent. Analysis Catgories don't expand
 LIMS-1875: Able to deactivate instruments and reference samples without logging in
 LIMS-2049: Displaying lists doesn't work as expected in 319
@@ -336,8 +341,8 @@ LIMS-1425: Verify Workflow (bika_listing) recursion
 - JSONAPI: Added 'remove' and 'getusers' methods.
 - Refactored ARSpecs, and added ResultsRange field to the AR
 
-3.1.4.1 (2014-07-24)
---------------------
+3.1.4.1-2 (2014-07-24)
+----------------------
 
 3.1.4 release was broken, simple ARs could not be created.
 
@@ -417,8 +422,10 @@ LIMS-1240: Hide "copy to new" from Analyst users
 
 LIMS-1059: Added worksheet rejection workflow
     RejectAnalysis (Analysis subclass (has IAnalysis!)) workflow transition.
+
     Does not retract individual Analysis objects - instead, forces their state
         back to "Received", and assigns them onto newly created WS.
+
     Sets attributes on src and dst worksheets:
         WS instance rejected worksheet attribute: .replaced_by = UID
         WS instance replacement worksheet attribute: .replaces_rejected_worksheet:UID
@@ -496,16 +503,13 @@ assigned. These defaults can be changed in BikaSetup > Security.
 - Fix some out-dated dependencies that prevented the app from loading.
 
 - Development of the current bika 3.0 code has slowed, and our efforts have been focused on
-the 3.01a branch for some time.
+  the 3.01a branch for some time.
+
 
 3.0rc3.5.1 (2013-10-25)
 -----------------------
 
 Fix CSS AR Publication error
-
-3.0rc3.5.1 (2013-10-25)
------------------------
-
 Fix error displaying client sample views
 
 3.0rc3.5 (2013-10-24)
@@ -560,17 +564,17 @@ http://plone.org/documentation/manual/upgrade-guide
 - Many many bugfixes.
 
 3.0rc2.3 (2013-01-29)
--------------------
+---------------------
 
 - Fix bad HTML
 
 3.0rc2.2 (2013-01-28)
--------------------
+---------------------
 
 - Fix an error during AR Publish
 
 3.0rc2.1 (2013-01-21)
--------------------
+---------------------
 
 - Fix bad HTML
 - Pin collective.js.jqueryui version to 1.8.16.9

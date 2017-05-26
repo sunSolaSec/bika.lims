@@ -1,11 +1,11 @@
 import os
 from setuptools import setup, find_packages
 
-version = '3.1.13'
+version = '3.1.14'
 
 
 def read(*rnames):
-    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+    return open(os.path.join(os.path.dirname(__file__), *rnames)).read() + "\n"
 
 setup(name='bika.lims',
       version=version,
@@ -17,13 +17,14 @@ setup(name='bika.lims',
                        "Authors and maintainers\n" + \
                        "-----------------------\n" + \
                        "- Bika Lab Systems, http://bikalabs.com\n" + \
-                       "- Naralabs, http://naralabs.com",
+                       "- Naralabs, http://naralabs.com" + \
+                       "- RIDING BYTES, http://ridingbytes.com",
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
       classifiers=[
           "Framework :: Plone",
           "Programming Language :: Python",
-          "Development Status :: 5 - Production/Stable", 
+          "Development Status :: 5 - Production/Stable",
           "Environment :: Web Environment",
           "Intended Audience :: Information Technology",
           "Intended Audience :: Science/Research",
@@ -68,6 +69,7 @@ setup(name='bika.lims',
           'z3c.jbot',
           'plone.resource',
           'CairoSVG==1.0.20',
+          'Plone<=4.3.11',
       ],
       extras_require={
           'test': [
