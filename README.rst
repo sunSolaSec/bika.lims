@@ -1,7 +1,7 @@
 Bika LIMS
 =========
 
-v3.1.14 (2017-05-26)
+v3.1.15 (2017-05-27)
 
 
 The meaning of Gaob
