@@ -7,8 +7,7 @@ from Products.CMFCore.permissions import ModifyPortalContent, AddPortalContent
 from plone.dexterity.content import Container
 from zope.interface import implements
 
-from plone.autoform import directives
-from plone.supermodel.directives import primary
+from plone.namedfile.field import NamedBlobFile
 
 class IContract(model.Schema):
 
@@ -35,8 +34,8 @@ class IContract(model.Schema):
                 description=_(u""),
                 required=False
                 )
-	doc = schema.Bytes(
-                title=_(u"representant du centre"),
+	doc = NamedBlobFile(
+                title=_(u"documentation"),
                 description=_(u""),
                 required=False
                 )
