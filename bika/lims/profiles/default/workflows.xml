@@ -516,5 +516,16 @@
       <bound-workflow workflow_id="bika_cancellation_workflow"/>
     </type>
 
+    <!-- Contracts live in Clients -->
+    <type type_id="Contract">
+      <bound-workflow workflow_id="bika_one_state_workflow"/>
+      <bound-workflow workflow_id="bika_inactive_workflow"/>
+    </type>
+    <!-- Imputations live in Clients -->
+    <type type_id="Imputation">
+      <bound-workflow workflow_id="bika_one_state_workflow"/>
+      <bound-workflow workflow_id="bika_inactive_workflow"/>
+    </type>
+
   </bindings>
 </object>

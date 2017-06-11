@@ -5,20 +5,17 @@
 # Copyright 2011-2017 by it's authors.
 # Some rights reserved. See LICENSE.txt, AUTHORS.txt.
 
-import re
 from operator import itemgetter
-
 from AccessControl import getSecurityManager
-
-from Products.CMFPlone import PloneMessageFactory
 from Products.CMFCore.permissions import ModifyPortalContent
-
-from bika.lims import api
+from Products.CMFPlone import PloneMessageFactory
 from bika.lims import bikaMessageFactory as _
 from bika.lims.browser.bika_listing import BikaListingView
-from bika.lims.permissions import EditResults
-from bika.lims.permissions import AddAnalysisRequest
-from bika.lims.permissions import ManageAnalysisRequests
+from bika.lims.permissions import EditResults, AddAnalysisRequest, \
+    ManageAnalysisRequests
+from Products.CMFCore.utils import getToolByName
+
+import re
 
 
 class BatchBookView(BikaListingView):
@@ -28,7 +25,7 @@ class BatchBookView(BikaListingView):
         self.icon = self.portal_url + \
             "/++resource++bika.lims.images/batchbook_big.png"
         self.context_actions = {}
-        self.contentFilter = {"sort_on": "created"}
+        self.contentFilter = {"sort_on":"created"}
         self.title = context.Title()
         self.Description = context.Description()
         self.show_select_all_checkbox = True
@@ -91,16 +88,18 @@ class BatchBookView(BikaListingView):
 
     @property
     def copy_to_new_allowed(self):
-        mtool = api.get_tool('portal_membership')
+        mtool = getToolByName(self.context, 'portal_membership')
         if mtool.checkPermission(ManageAnalysisRequests, self.context) \
                 or mtool.checkPermission(ModifyPortalContent, self.context) \
                 or mtool.checkPermission(AddAnalysisRequest, self.portal):
+	    print "copy to new batch/batchBook"
             return True
         return False
 
     def __call__(self):
         # Allow "Modify portal content" to see edit widgets
-        mtool = api.get_tool('portal_membership')
+	print "call me batch/BatchBook"
+        mtool = getToolByName(self.context, 'portal_membership')
         self.allow_edit = mtool.checkPermission("Modify portal content", self.context)
         # Allow certain users to duplicate ARs (Copy to new).
         if self.copy_to_new_allowed:
@@ -114,6 +113,7 @@ class BatchBookView(BikaListingView):
                      ])
                 review_state['custom_actions'] = custom_actions
                 review_states.append(review_state)
+		print "it is already copy "
             self.review_states = review_states
         return super(BatchBookView, self).__call__()
 
@@ -121,7 +121,7 @@ class BatchBookView(BikaListingView):
         """Accumulate a list of all AnalysisRequest objects contained in
         this Batch, as well as those which are inherited.
         """
-        wf = api.get_tool('portal_workflow')
+        wf = getToolByName(self.context, 'portal_workflow')
         schema = self.context.Schema()
 
         ars = []
@@ -247,10 +247,7 @@ class BatchBookView(BikaListingView):
                     items[i]['class'][keyword] = 'empty'
         if self.insert_submit_button:
             custom_actions = self.review_states[0].get('custom_actions', [])
-            custom_actions.append({
-                'id': 'submit',
-                'title': _('Submit'),
-            })
+            custom_actions.append({'id': 'submit'})
             self.review_states[0]['custom_actions'] = custom_actions
 
         self.categories.sort()

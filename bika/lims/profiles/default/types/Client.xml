@@ -29,6 +29,8 @@
   <element value="SupplyOrder"/>
   <element value="Folder"/>
   <element value="SamplingRound"/>
+  <element value="Contract"/>
+  <element value="Imputation"/>
  </property>
  <property name="allow_discussion">False</property>
  <property name="immediate_view">base_edit</property>
@@ -69,7 +71,7 @@
          link_target=""
          url_expr="string:${object_url}/analysisrequests"
          i18n:attributes="title"
-         visible="True">
+         visible="False">
   <permission value="View"/>
  </action>
 
@@ -81,7 +83,7 @@
          link_target=""
          url_expr="string:${object_url}/samples"
          i18n:attributes="title"
-         visible="True">
+         visible="False">
   <permission value="BIKA: Manage Samples"/>
  </action>
 
@@ -93,7 +95,7 @@
          link_target=""
          url_expr="string:${object_url}/arimports"
          i18n:attributes="title"
-         visible="True">
+         visible="False">
   <permission value="BIKA: Manage ARImport"/>
  </action>
 
@@ -105,7 +107,7 @@
          link_target=""
          url_expr="string:${object_url}/samplepoints"
          i18n:attributes="title"
-         visible="True">
+         visible="False">
   <permission value="BIKA: Manage Samples"/>
  </action>
 
@@ -129,7 +131,7 @@
          link_target=""
          url_expr="string:${object_url}/artemplates"
          i18n:attributes="title"
-         visible="True">
+         visible="False">
   <permission value="View"/>
  </action>
 
@@ -141,7 +143,7 @@
          link_target=""
          url_expr="string:${object_url}/analysisspecs"
          i18n:attributes="title"
-         visible="True">
+         visible="False">
   <permission value="View"/>
  </action>
 
@@ -165,7 +167,7 @@
          link_target=""
          url_expr="string:${object_url}/srtemplates"
          i18n:attributes="title"
-         visible="True">
+         visible="False">
   <permission value="View"/>
  </action>
 
@@ -189,7 +191,7 @@
          link_target=""
          url_expr="string:${object_url}/orders"
          i18n:attributes="title"
-         visible="True">
+         visible="False">
     <permission value="BIKA: Manage Supply Orders"/>
  </action>
 
@@ -208,6 +210,16 @@
          category="object"
          icon_expr="string:${portal_url}/images/client_contact.png"
          url_expr="string:${object_url}/contacts"
+         i18n:attributes="title"
+         visible="True">
+    <permission value="Modify portal content"/>
+ </action>
+
+ <action title="Contracts"
+         action_id="contracts"
+         category="object"
+         icon_expr="string:${portal_url}/images/contract.png"
+         url_expr="string:${object_url}/contracts"
          i18n:attributes="title"
          visible="True">
     <permission value="Modify portal content"/>

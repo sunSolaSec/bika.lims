@@ -227,6 +227,15 @@ class IContact(Interface):
 
     ""
 
+class IContracts(Interface):
+
+    ""
+
+
+class IContract(Interface):
+
+    ""
+
 
 class IDepartments(Interface):
 

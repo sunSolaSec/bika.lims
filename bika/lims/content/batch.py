@@ -25,8 +25,16 @@ from plone.indexer import indexer
 from Products.Archetypes.references import HoldingReference
 from Products.ATExtensions.ateapi import RecordsField
 from bika.lims.browser.widgets import RecordsWidget as bikaRecordsWidget
+from bika.lims.browser.fields import DurationField
+from bika.lims.browser.widgets.durationwidget import DurationWidget
 
 from bika.lims.browser.widgets import ReferenceWidget
+from DateTime import DateTime
+
+from Products.CMFCore import permissions
+from Products.CMFCore.permissions import View
+import sys
+
 
 
 class InheritedObjectsUIField(RecordsField):
@@ -66,25 +74,19 @@ class InheritedObjectsUIField(RecordsField):
         return _field.set(instance, uids)
 
 
+    
+
+
 schema = BikaFolderSchema.copy() + Schema((
-    StringField(
-        'BatchID',
-        searchable=True,
-        required=False,
-        validators=('uniquefieldvalidator',),
-        widget=StringWidget(
-            visible=True,
-            label=_("Batch ID"),
-        )
-    ),
-    ReferenceField(
+
+     ReferenceField(
         'Client',
-        required=0,
+        required=1,
         allowed_types=('Client',),
         relationship='BatchClient',
-        widget=ReferenceWidget(
+	widget=ReferenceWidget(
             label=_("Client"),
-            size=30,
+            size=40,
             visible=True,
             base_query={'inactive_state': 'active'},
             showOn=True,
@@ -94,21 +96,86 @@ schema = BikaFolderSchema.copy() + Schema((
                      ],
       ),
     ),
+
+    ComputedField(
+        'ClientUID',
+        searchable=True,
+        expression='here.getClient().UID()',        
+	widget=ComputedWidget(
+            visible=False,
+        ),
+    ),
+
+    ReferenceField(
+        'Contact',
+        required=1,
+        default_method='getContactUIDForUser',
+        vocabulary_display_path_bound=sys.maxsize,
+        allowed_types=('Contact',),
+        referenceClass=HoldingReference,
+        relationship='BatchContact',
+        mode="rw",
+        read_permission=permissions.View,\
+        widget=ReferenceWidget(
+            label=_("Contact"),
+            size=40,
+            helper_js=("bika_widgets/referencewidget.js",
+                       "++resource++bika.lims.js/contact.js"),
+            visible=True,
+            showOn=True,
+            popup_width='400px',
+            colModel=[{'columnName': 'UID', 'hidden': True},
+                      {'columnName': 'Fullname', 'width': '50',
+                       'label': _('Name')},
+                      {'columnName': 'EmailAddress', 'width': '50',
+                       'label': _('Email Address')},
+                      ],
+        ),
+    ),
+
+    DateTimeField(
+        'BatchDate',
+        required=False,
+	default_method = 'current_date',
+	widget=DateTimeWidget(
+            label=_('Date of creation'),
+	    size=40,
+	    visible=True
+        ),
+    ),
+    
+    DateTimeField(
+        'BatchDateLimit',
+        required=False,
+	widget=DateTimeWidget(
+            label=_('Date limit for Results'),
+	    size=40,
+        ),
+    ),
+
+    StringField(
+        'BatchID',
+        searchable=True,
+        mode="rw",
+        expression='self.getId()',
+        widget=StringWidget(
+            label=_("Batch ID"),
+	    visible=True,
+	    size=40,
+        )
+    ),
+   
     StringField(
         'ClientBatchID',
         searchable=True,
         required=0,
         widget=StringWidget(
-            label=_("Client Batch ID")
+            label=_("Client ID"),
+	    visible=True,
+	    size=40,
         )
     ),
-    DateTimeField(
-        'BatchDate',
-        required=False,
-        widget=DateTimeWidget(
-            label=_('Date'),
-        ),
-    ),
+
     LinesField(
         'BatchLabels',
         vocabulary="BatchLabelVocabulary",
@@ -116,6 +183,7 @@ schema = BikaFolderSchema.copy() + Schema((
         widget=MultiSelectionWidget(
             label=_("Batch Labels"),
             format="checkbox",
+	    visible=False,
         )
     ),
     TextField(
@@ -156,6 +224,7 @@ schema = BikaFolderSchema.copy() + Schema((
                            },
         widget = bikaRecordsWidget(
             label=_("Inherit From"),
+	    visible=False,
             description=_(
                 "Include all analysis requests belonging to the selected objects."),
             innerJoin="<br/>",
@@ -194,17 +263,12 @@ schema = BikaFolderSchema.copy() + Schema((
 )
 )
 
-schema['BatchID'].widget.description = _("If no value is entered, the Batch ID will be auto-generated.")
-schema['title'].required = False
-schema['title'].widget.visible = True
-schema['title'].widget.description = _("If no value is entered, the Batch ID will be used.")
-schema['description'].required = False
-schema['description'].widget.visible = True
 
-schema.moveField('ClientBatchID', before='description')
-schema.moveField('BatchID', before='description')
-schema.moveField('title', before='description')
-schema.moveField('Client', after='title')
+schema['title'].required = False
+schema['title'].expression = 'self.getId()'
+schema['title'].widget.size = 10
+schema['description'].widget.visible = False
+schema['title'].widget.description = _("the Batch ID will be used by default.")
 
 
 class Batch(ATFolder):
@@ -214,6 +278,10 @@ class Batch(ATFolder):
     schema = schema
 
     _at_rename_after_creation = True
+
+    security.declarePublic('current_date')
+    def current_date(self):
+        return DateTime()
 
     def _renameAfterCreation(self, check_auto_id=False):
         from bika.lims.idserver import renameAfterCreation
@@ -292,11 +360,23 @@ class Batch(ATFolder):
     security.declarePublic('getBatchID')
 
     def getBatchID(self):
-        if self.BatchID:
-            return self.BatchID
-        if self.checkCreationFlag():
-            return self.BatchID
+        #if self.BatchID != '':
+         #   return self.BatchID
         return self.getId()
+
+    security.declarePublic('getContactUIDForUser')
+
+    def getContactUIDForUser(self):
+        """ get the UID of the contact associated with the authenticated
+            user
+        """
+        user = self.REQUEST.AUTHENTICATED_USER
+        user_id = user.getUserName()
+        pc = getToolByName(self, 'portal_catalog')
+        r = pc(portal_type='Contact',
+               getUsername=user_id)
+        if len(r) == 1:
+            return r[0].UID
 
     def BatchLabelVocabulary(self):
         """ return all batch labels """
@@ -356,7 +436,10 @@ class Batch(ATFolder):
         canstatus = getCurrentState(self, StateFlow.cancellation)
         return revstatus == BatchState.open \
             and canstatus == CancellationState.active
-
+    
+    def startDefaultValue():
+    	return datetime.datetime.today() + datetime.timedelta(7)
+	
 
 registerType(Batch, PROJECTNAME)
 

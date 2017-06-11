@@ -20,6 +20,8 @@ from views.orders import ClientOrdersView
 from views.contacts import ClientContactsView
 from views.contacts import ClientContactVocabularyFactory
 from views.samplingrounds import ClientSamplingRoundsView
+from views.contracts import ClientContractsView
+from views.contracts import ContractImputationsView
 
 from ajax import ReferenceWidgetVocabulary
 from ajax import ajaxGetClientInfo

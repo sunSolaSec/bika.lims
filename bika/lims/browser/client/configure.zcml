@@ -139,4 +139,20 @@
       layer="bika.lims.interfaces.IBikaLIMS"
     />
 
+    <browser:page
+      for="bika.lims.interfaces.IClient"
+      name="contracts"
+      class="bika.lims.browser.client.ClientContractsView"
+      permission="zope2.View"
+      layer="bika.lims.interfaces.IBikaLIMS"
+    />
+
+   <browser:page
+      for="bika.lims.content.contract.IContract"
+      name="imputations"
+      class="bika.lims.browser.client.ContractImputationsView"
+      permission="zope2.View"
+      layer="bika.lims.interfaces.IBikaLIMS"
+    />
+
 </configure>

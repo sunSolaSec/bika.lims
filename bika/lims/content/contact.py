@@ -60,6 +60,7 @@ schema = Person.schema.copy() + atapi.Schema((
                              checkbox_bound=0,
                              label=_("Contacts to CC"),
                          )),
+	
 ))
 
 
