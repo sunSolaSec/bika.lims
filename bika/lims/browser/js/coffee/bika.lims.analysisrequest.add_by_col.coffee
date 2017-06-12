@@ -177,7 +177,7 @@ window.AnalysisRequestAddByCol = ->
       ###
 
       if data.success and data.total_objects == 1 and window.location.pathname.split('batches').length < 2
-        contact = data.objects[0]
+        contact = data.objects[1]
         $('input#Contact-0').attr('uid', contact['UID']).val(contact['Title']).attr('uid_check', contact['UID']).attr 'val_check', contact['UID']
         $('#Contact-0_uid').val contact['UID']
         state_set 0, 'Contact', contact['UID']

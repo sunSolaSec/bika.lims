@@ -108,14 +108,14 @@ schema = BikaFolderSchema.copy() + Schema((
 
     ReferenceField(
         'Contact',
-        required=1,
+        required=0,
         default_method='getContactUIDForUser',
         vocabulary_display_path_bound=sys.maxsize,
         allowed_types=('Contact',),
         referenceClass=HoldingReference,
         relationship='BatchContact',
         mode="rw",
-        read_permission=permissions.View,\
+        read_permission=permissions.View,
         widget=ReferenceWidget(
             label=_("Contact"),
             size=40,
@@ -129,6 +129,26 @@ schema = BikaFolderSchema.copy() + Schema((
                        'label': _('Name')},
                       {'columnName': 'EmailAddress', 'width': '50',
                        'label': _('Email Address')},
+                      ],
+        ),
+    ),
+    ReferenceField(
+        'Imputation',
+        required=0,
+        vocabulary_display_path_bound=sys.maxsize,
+        allowed_types=('Imputation'),
+        relationship='BatchImputation',
+        mode="rw",
+        read_permission=permissions.View,
+        widget=ReferenceWidget(
+            label=_("Imputation"),
+            size=40,
+            visible=True,
+            showOn=True,
+            popup_width='400px',
+            colModel=[{'columnName': 'UID', 'hidden': True},
+                      {'columnName': 'number', 'width': '50',
+                       'label': _('number')},
                       ],
         ),
     ),
@@ -148,7 +168,7 @@ schema = BikaFolderSchema.copy() + Schema((
         'BatchDateLimit',
         required=False,
 	widget=DateTimeWidget(
-            label=_('Date limit for Results'),
+            label=_('Date limit pour le stockage'),
 	    size=40,
         ),
     ),
@@ -312,6 +332,14 @@ class Batch(ATFolder):
         if IClient.providedBy(client):
             return client
 
+    def getImputation(self):
+        client = self.Schema().getField('Client').get(self)
+        if client:
+            return client
+        client = self.aq_parent
+        if IClient.providedBy(client):
+            return client
+
     def getClientTitle(self):
         client = self.getClient()
         if client:
@@ -439,7 +467,8 @@ class Batch(ATFolder):
     
     def startDefaultValue():
     	return datetime.datetime.today() + datetime.timedelta(7)
-	
+
+
 
 registerType(Batch, PROJECTNAME)
 

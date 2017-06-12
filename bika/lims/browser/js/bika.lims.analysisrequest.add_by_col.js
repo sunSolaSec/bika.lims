@@ -18,6 +18,10 @@
  * a particular element from JS.
  */
 
+
+/*=====================================================  part 1  =================================================================================*/
+
+
 (function() {
   window.AnalysisRequestAddByCol = function() {
 
@@ -122,6 +126,8 @@
       $('#singleservice').parents('[title]').attr('title', '');
       $('input[type=\'checkbox\']').removeAttr('checked');
       $('.min,.max,.error').val('');
+
+
       setTimeout((function() {
         nr_ars = parseInt($('#ar_count').val(), 10);
         arnum = 0;
@@ -131,7 +137,10 @@
         }
       }), 250);
 
-      /** If client only has one contect, and the analysis request comes from
+
+
+
+      /** If client only has one contact, and the analysis request comes from
         * a client, then Auto-complete first Contact field.
         * If client only has one contect, and the analysis request comes from
         * a batch, then Auto-complete all Contact field.
@@ -170,6 +179,10 @@
         }
       });
     };
+
+
+
+
     state_set = function(arnum, fieldname, value) {
       var arnum_i;
       console.info("state_set::" + fieldname + " -> " + value);
@@ -196,6 +209,9 @@
         i++;
       }
     };
+
+
+
     setupSamplingRoundInfo = function(samplinground_UID) {
 
       /**
@@ -246,6 +262,9 @@
         }
       });
     };
+
+
+
     filter_combogrid = function(element, filterkey, filtervalue, querytype) {
 
       /* Apply or modify a query filter for a reference widget.
@@ -283,6 +302,8 @@
       $(element).combogrid(options);
       $(element).attr('search_query', '{}');
     };
+
+
     filter_by_client = function(arnum) {
 
       /***
@@ -315,6 +336,9 @@
       element = $('tr[fieldname=Specification] td[arnum=' + arnum + '] input')[0];
       filter_combogrid(element, 'getClientUID', uids);
     };
+
+
+
     hashes_to_hash = function(hashlist, key) {
 
       /* Convert a list of hashes to a hash, by one of their keys.
@@ -331,6 +355,9 @@
       }
       return ret;
     };
+
+
+
     hash_to_hashes = function(hash) {
 
       /* Convert a single hash into a list of hashes
@@ -344,6 +371,8 @@
       });
       return ret;
     };
+
+
     get_arnum = function(element) {
       var arnum, td;
       arnum = void 0;
@@ -360,6 +389,7 @@
       }
       console.error('No arnum found for element ' + element);
     };
+
     destroy = function(arr, val) {
       var i;
       i = 0;
@@ -371,6 +401,9 @@
       }
       return arr;
     };
+
+
+/*=================================================  Part Two =========================================================*/
 
     /*
      checkbox_change - applies to all except analysis services
@@ -653,6 +686,9 @@
         }
       });
     };
+
+
+/*===================================================   Part 3  =============================================================*/
 
     /*
      --- These configure the jquery bindings for different fields ---
@@ -1344,6 +1380,9 @@
       });
     };
 
+
+/*============================================= Part 4  ==================================================*/
+
     /*
      singleservice_dropdown_init    - configure the combogrid (includes handler)
      singleservice_duplicate        - create new service row
@@ -1635,6 +1674,9 @@
       return def;
     };
 
+
+/*============================================   Part 5  =================================================*/
+
     /* - analysis_cb_click   user interaction with form (select, unselect)
      * - analysis_cb_check   performs the same action, but from code (no .click)
      * - analysis_cb_uncheck does the reverse
@@ -1785,6 +1827,10 @@
         recalc_prices(arnum);
       }
     };
+
+
+
+/*=============================================== Part 6======================================================*/
 
     /*
      deps_calc                  - the main routine for dependencies/dependants
@@ -1988,6 +2034,11 @@
       }
       _partition_indicators_set(arnum);
     };
+
+
+
+
+/*=============================================== Part 7======================================================*/
 
     /* partnrs_calc calls the ajax url, and sets the state variable
      * partition_indicators_set calls partnrs_calc, and modifies the form.
@@ -2313,6 +2364,10 @@
       $('input[type=text]').prop('autocomplete', 'off');
       form_init();
 
+
+
+
+/*=============================================== Part 8======================================================*/
       /*
        The state variable is fully populated when the form is submitted,
        but in many cases it must be updated on the fly, to allow the form

@@ -87,6 +87,9 @@ from bika.lims.config import PROJECTNAME
 from bika.lims import bikaMessageFactory as _
 from bika.lims.content.bikaschema import BikaSchema
 
+#Python
+from Acquisition import aq_inner
+
 """The request for analysis by a client. It contains analysis instances.
 """
 
@@ -149,7 +152,7 @@ schema = BikaSchema.copy() + Schema((
         'Contact',
         required=1,
         default_method='getContactUIDForUser',
-        vocabulary_display_path_bound=sys.maxsize,
+	ocabulary_display_path_bound=sys.maxsize,
         allowed_types=('Contact',),
         referenceClass=HoldingReference,
         relationship='AnalysisRequestContact',
@@ -198,7 +201,7 @@ schema = BikaSchema.copy() + Schema((
     ReferenceField(
         'CCContact',
         multiValued=1,
-        vocabulary_display_path_bound=sys.maxsize,
+	vocabulary_display_path_bound=sys.maxsize,
         allowed_types=('Contact',),
         referenceClass=HoldingReference,
         relationship='AnalysisRequestCCContact',
@@ -676,6 +679,7 @@ schema = BikaSchema.copy() + Schema((
         'SamplingDate',
         proxy="context.getSample()",
         required=1,
+	default_method='current_date',
         mode="rw",
         read_permission=permissions.View,
         write_permission=permissions.ModifyPortalContent,
@@ -2303,25 +2307,17 @@ class AnalysisRequest(BaseFolder):
         return verifier
 
     security.declarePublic('getContactUIDForUser')
+    def getContactUIDForUser(self,context):
+        """get the UID of the contact associated with batch parent"""
+	print"==================================================================getContactUID"
+	return self.aq_parent.getContact().UID
 
-    def getContactUIDForUser(self):
-        """get the UID of the contact associated with the authenticated user
-        """
-        user = self.REQUEST.AUTHENTICATED_USER
-        user_id = user.getUserName()
-        pc = getToolByName(self, 'portal_catalog')
-        r = pc(portal_type='Contact',
-               getUsername=user_id)
-        if len(r) == 1:
-            return r[0].UID
 
     security.declarePublic('current_date')
-
     def current_date(self):
-        """return current date
-        """
-        # noinspection PyCallingNonCallable
-        return DateTime()
+        """return current date """
+	return DateTime()
+
 
     def getQCAnalyses(self, qctype=None, review_state=None):
         """return the QC analyses performed in the worksheet in which, at
@@ -2691,6 +2687,9 @@ class AnalysisRequest(BaseFolder):
                       if not a.isUserAllowedToVerify(member)]
         return not notallowed
 
+
+#============================   Guards =============================================================================
+
     def guard_verify_transition(self):
         """Checks if the verify transition can be performed to the current
         Analysis Request by the current user depending on the user roles, as
@@ -2754,6 +2753,8 @@ class AnalysisRequest(BaseFolder):
                 isBasicTransitionAllowed(self):
             return True
         return False
+
+#========================================  WorkFlow =====================================================================
 
     def workflow_script_receive(self):
         if skip(self, "receive"):
@@ -2924,3 +2925,4 @@ class AnalysisRequest(BaseFolder):
 
 
 registerType(AnalysisRequest, PROJECTNAME)
+

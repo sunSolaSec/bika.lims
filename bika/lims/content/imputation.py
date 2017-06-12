@@ -10,6 +10,8 @@ from zope.schema.interfaces import IContextSourceBinder
 from datetime import date
 from Products.CMFCore.permissions import ModifyPortalContent, AddPortalContent
 
+from bika.lims.browser.fields import DurationField
+
 class AnalysisProfiles(object):
     """Context source binder to provide a vocabulary of analysis profil.
     """
@@ -48,7 +50,7 @@ class AnalysisProfiles(object):
 
 
 
-class ContactsP(object):
+class ContactsPrincipale(object):
     """Context source binder to provide a vocabulary of clients contacts.
     """
     implements(IContextSourceBinder)
@@ -84,7 +86,7 @@ class ContactsP(object):
             terms.append(SimpleVocabulary.createTerm(art_uid, str(art_uid), title))
         return SimpleVocabulary(terms)
 
-class ContactsS(object):
+class ContactsSecondaire(object):
     """provide a vocabulary of lab contacts.
     """
     implements(IContextSourceBinder)
@@ -110,9 +112,9 @@ class IImputation(model.Schema):
         """
 
         title = schema.TextLine(
-                title=_(u"Number"),
+                title=_(u"Designation"),
                 description=_(u""),
-                required=True
+                required=False
                 )
 
         number = schema.Text(
@@ -126,9 +128,11 @@ class IImputation(model.Schema):
                 description=_(u""),
                 required=False,
                 )
-	delais_stock = schema.Int(
+
+	delais_stock =schema.Int(
             title=_(u'Delais du stock par mois')
         )
+
 	analysis_profiles = schema.List(
             title=_(u'Analysis Profil'),
             value_type=schema.Choice(
@@ -139,13 +143,13 @@ class IImputation(model.Schema):
 	contacts_p = schema.List(
             title=_(u'Principale distination'),
             value_type=schema.Choice(
-                source=ContactsP()
+                source=ContactsPrincipale()
             )
         )
 	contacts_s = schema.List(
             title=_(u'Second distination'),
             value_type=schema.Choice(
-                source=ContactsS()
+                source=ContactsSecondaire()
             )
         )
 	
