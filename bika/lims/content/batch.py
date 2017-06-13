@@ -398,6 +398,7 @@ class Batch(ATFolder):
         """ get the UID of the contact associated with the authenticated
             user
         """
+        print "===========================================getUIDForUSR"
         user = self.REQUEST.AUTHENTICATED_USER
         user_id = user.getUserName()
         pc = getToolByName(self, 'portal_catalog')

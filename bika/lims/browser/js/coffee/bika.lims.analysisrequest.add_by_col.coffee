@@ -136,14 +136,11 @@ window.AnalysisRequestAddByCol = ->
 
     # clear existing values (on page reload).
     # XXX: Where is this #singleservice element?
-    $('#singleservice').val ''
-    $('#singleservice').attr 'uid', 'new'
-    $('#singleservice').attr 'title', ''
-    $('#singleservice').parents('[uid]').attr 'uid', 'new'
-    $('#singleservice').parents('[keyword]').attr 'keyword', ''
-    $('#singleservice').parents('[title]').attr 'title', ''
-    $('input[type=\'checkbox\']').removeAttr 'checked'
-    $('.min,.max,.error').val ''
+    ###
+    
+    console.debug "=================================="
+    ###
+    
 
     # filter fields based on the selected Client
     # we need a little delay here to be sure the elements have finished
@@ -177,7 +174,7 @@ window.AnalysisRequestAddByCol = ->
       ###
 
       if data.success and data.total_objects == 1 and window.location.pathname.split('batches').length < 2
-        contact = data.objects[1]
+        contact = data.objects[0]
         $('input#Contact-0').attr('uid', contact['UID']).val(contact['Title']).attr('uid_check', contact['UID']).attr 'val_check', contact['UID']
         $('#Contact-0_uid').val contact['UID']
         state_set 0, 'Contact', contact['UID']
@@ -199,7 +196,7 @@ window.AnalysisRequestAddByCol = ->
 
 
   state_set = (arnum, fieldname, value) ->
-    console.info "state_set::#{fieldname} -> #{value}"
+    console.info "state_set_Souad::#{fieldname} -> #{value}"
 
     ### Use this function to set values in the state variable.
     ###
@@ -1358,7 +1355,6 @@ window.AnalysisRequestAddByCol = ->
 
   drymatter_set = (arnum) ->
     ### set the Dry Matter service, dependencies, etc
-
      skip_indicators should be true if you want to prevent partition
      indicators from being set.  This is useful if drymatter is being
      checked during the application of a Template to this column.
@@ -1551,15 +1547,12 @@ window.AnalysisRequestAddByCol = ->
      this function is reponsible for duplicating the TR.  This is
      factored out so that template, profile etc, can also duplicate
      rows.
-
      Clobber the old row first, set all it's attributes to look like
      bika_listing version of itself.
-
      The attributes are a little wonky perhaps.  They should mimic the
      attributes that bika_listing rows get, so that the event handlers
      don't have to care.  In some cases though, we need functions for
      both.
-
      does not set any checkbox values
     ###
 
@@ -1630,7 +1623,6 @@ window.AnalysisRequestAddByCol = ->
      When the single-service serviceselector is in place,
      this function is called to select services for setting a bunch
      of services in one AR, eg Profiles and Templates.
-
      service_data is included from the JSONReadExtender of Profiles and
      Templates.
     ###
@@ -1742,9 +1734,7 @@ window.AnalysisRequestAddByCol = ->
      on first expansion.  duplicated from bika.lims.bikalisting.js, this code
      fires when categories are expanded automatically (eg, when profiles or templates require
      that the category contents are visible for selection)
-
      Also, this code returns deferred objects, not their promises.
-
      :param: element - The category header TH element which normally receives 'click' event
     ###
 
@@ -2496,8 +2486,11 @@ window.AnalysisRequestAddByCol = ->
   'use strict'
   that = this
 
+
+#===================================================================================================================================================
+
   that.load = ->
-    console.debug "*** LOADING AR FORM CONTROLLER ***"
+    console.debug "*** LOADING AR FORM CONTROLLER SOO***"
 
     # disable browser autocomplete
     $('input[type=text]').prop 'autocomplete', 'off'

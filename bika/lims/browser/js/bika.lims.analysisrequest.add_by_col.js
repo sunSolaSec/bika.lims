@@ -18,10 +18,6 @@
  * a particular element from JS.
  */
 
-
-/*=====================================================  part 1  =================================================================================*/
-
-
 (function() {
   window.AnalysisRequestAddByCol = function() {
 
@@ -118,16 +114,11 @@
         }
         $(div).attr('id', 'archetypes-fieldname-' + fieldname + '-' + arnum);
       });
-      $('#singleservice').val('');
-      $('#singleservice').attr('uid', 'new');
-      $('#singleservice').attr('title', '');
-      $('#singleservice').parents('[uid]').attr('uid', 'new');
-      $('#singleservice').parents('[keyword]').attr('keyword', '');
-      $('#singleservice').parents('[title]').attr('title', '');
-      $('input[type=\'checkbox\']').removeAttr('checked');
-      $('.min,.max,.error').val('');
 
-
+      /*
+      
+      console.debug "=================================="
+       */
       setTimeout((function() {
         nr_ars = parseInt($('#ar_count').val(), 10);
         arnum = 0;
@@ -137,10 +128,7 @@
         }
       }), 250);
 
-
-
-
-      /** If client only has one contact, and the analysis request comes from
+      /** If client only has one contect, and the analysis request comes from
         * a client, then Auto-complete first Contact field.
         * If client only has one contect, and the analysis request comes from
         * a batch, then Auto-complete all Contact field.
@@ -179,13 +167,9 @@
         }
       });
     };
-
-
-
-
     state_set = function(arnum, fieldname, value) {
       var arnum_i;
-      console.info("state_set::" + fieldname + " -> " + value);
+      console.info("state_set_Souad::" + fieldname + " -> " + value);
 
       /* Use this function to set values in the state variable.
        */
@@ -209,9 +193,6 @@
         i++;
       }
     };
-
-
-
     setupSamplingRoundInfo = function(samplinground_UID) {
 
       /**
@@ -262,9 +243,6 @@
         }
       });
     };
-
-
-
     filter_combogrid = function(element, filterkey, filtervalue, querytype) {
 
       /* Apply or modify a query filter for a reference widget.
@@ -302,8 +280,6 @@
       $(element).combogrid(options);
       $(element).attr('search_query', '{}');
     };
-
-
     filter_by_client = function(arnum) {
 
       /***
@@ -336,9 +312,6 @@
       element = $('tr[fieldname=Specification] td[arnum=' + arnum + '] input')[0];
       filter_combogrid(element, 'getClientUID', uids);
     };
-
-
-
     hashes_to_hash = function(hashlist, key) {
 
       /* Convert a list of hashes to a hash, by one of their keys.
@@ -355,9 +328,6 @@
       }
       return ret;
     };
-
-
-
     hash_to_hashes = function(hash) {
 
       /* Convert a single hash into a list of hashes
@@ -371,8 +341,6 @@
       });
       return ret;
     };
-
-
     get_arnum = function(element) {
       var arnum, td;
       arnum = void 0;
@@ -389,7 +357,6 @@
       }
       console.error('No arnum found for element ' + element);
     };
-
     destroy = function(arr, val) {
       var i;
       i = 0;
@@ -401,9 +368,6 @@
       }
       return arr;
     };
-
-
-/*=================================================  Part Two =========================================================*/
 
     /*
      checkbox_change - applies to all except analysis services
@@ -686,9 +650,6 @@
         }
       });
     };
-
-
-/*===================================================   Part 3  =============================================================*/
 
     /*
      --- These configure the jquery bindings for different fields ---
@@ -1266,7 +1227,6 @@
     drymatter_set = function(arnum) {
 
       /* set the Dry Matter service, dependencies, etc
-      
        skip_indicators should be true if you want to prevent partition
        indicators from being set.  This is useful if drymatter is being
        checked during the application of a Template to this column.
@@ -1380,9 +1340,6 @@
       });
     };
 
-
-/*============================================= Part 4  ==================================================*/
-
     /*
      singleservice_dropdown_init    - configure the combogrid (includes handler)
      singleservice_duplicate        - create new service row
@@ -1451,15 +1408,12 @@
        this function is reponsible for duplicating the TR.  This is
        factored out so that template, profile etc, can also duplicate
        rows.
-      
        Clobber the old row first, set all it's attributes to look like
        bika_listing version of itself.
-      
        The attributes are a little wonky perhaps.  They should mimic the
        attributes that bika_listing rows get, so that the event handlers
        don't have to care.  In some cases though, we need functions for
        both.
-      
        does not set any checkbox values
        */
       var existing, keyword, new_tr, price, service_label, title, tr, uid, vatamount;
@@ -1521,7 +1475,6 @@
        When the single-service serviceselector is in place,
        this function is called to select services for setting a bunch
        of services in one AR, eg Profiles and Templates.
-      
        service_data is included from the JSONReadExtender of Profiles and
        Templates.
        */
@@ -1629,9 +1582,7 @@
        on first expansion.  duplicated from bika.lims.bikalisting.js, this code
        fires when categories are expanded automatically (eg, when profiles or templates require
        that the category contents are visible for selection)
-      
        Also, this code returns deferred objects, not their promises.
-      
        :param: element - The category header TH element which normally receives 'click' event
        */
       var ajax_categories_enabled, ar_count, cat_title, def, form_id, options, placeholder, url;
@@ -1673,9 +1624,6 @@
       }
       return def;
     };
-
-
-/*============================================   Part 5  =================================================*/
 
     /* - analysis_cb_click   user interaction with form (select, unselect)
      * - analysis_cb_check   performs the same action, but from code (no .click)
@@ -1827,10 +1775,6 @@
         recalc_prices(arnum);
       }
     };
-
-
-
-/*=============================================== Part 6======================================================*/
 
     /*
      deps_calc                  - the main routine for dependencies/dependants
@@ -2034,11 +1978,6 @@
       }
       _partition_indicators_set(arnum);
     };
-
-
-
-
-/*=============================================== Part 7======================================================*/
 
     /* partnrs_calc calls the ajax url, and sets the state variable
      * partition_indicators_set calls partnrs_calc, and modifies the form.
@@ -2360,14 +2299,10 @@
     'use strict';
     that = this;
     that.load = function() {
-      console.debug("*** LOADING AR FORM CONTROLLER ***");
+      console.debug("*** LOADING AR FORM CONTROLLER SOO***");
       $('input[type=text]').prop('autocomplete', 'off');
       form_init();
 
-
-
-
-/*=============================================== Part 8======================================================*/
       /*
        The state variable is fully populated when the form is submitted,
        but in many cases it must be updated on the fly, to allow the form

@@ -87,9 +87,6 @@ from bika.lims.config import PROJECTNAME
 from bika.lims import bikaMessageFactory as _
 from bika.lims.content.bikaschema import BikaSchema
 
-#Python
-from Acquisition import aq_inner
-
 """The request for analysis by a client. It contains analysis instances.
 """
 
@@ -152,7 +149,7 @@ schema = BikaSchema.copy() + Schema((
         'Contact',
         required=1,
         default_method='getContactUIDForUser',
-	ocabulary_display_path_bound=sys.maxsize,
+        vocabulary_display_path_bound=sys.maxsize,
         allowed_types=('Contact',),
         referenceClass=HoldingReference,
         relationship='AnalysisRequestContact',
@@ -201,7 +198,7 @@ schema = BikaSchema.copy() + Schema((
     ReferenceField(
         'CCContact',
         multiValued=1,
-	vocabulary_display_path_bound=sys.maxsize,
+        vocabulary_display_path_bound=sys.maxsize,
         allowed_types=('Contact',),
         referenceClass=HoldingReference,
         relationship='AnalysisRequestCCContact',
@@ -598,6 +595,9 @@ schema = BikaSchema.copy() + Schema((
                 'sample_due': {'view': 'invisible', 'edit': 'invisible'},
                 'sample_prep': {'view': 'visible', 'edit': 'invisible'},
                 'sample_received': {'view': 'invisible', 'edit': 'invisible'},
+                'attachment_due': {'view': 'invisible', 'edit': 'invisible'},
+                'to_be_verified': {'view': 'invisible', 'edit': 'invisible'},
+                'verified': {'view': 'invisible', 'edit': 'invisible'},
                 'attachment_due': {'view': 'invisible', 'edit': 'invisible'},
                 'to_be_verified': {'view': 'invisible', 'edit': 'invisible'},
                 'verified': {'view': 'invisible', 'edit': 'invisible'},
@@ -2307,16 +2307,21 @@ class AnalysisRequest(BaseFolder):
         return verifier
 
     security.declarePublic('getContactUIDForUser')
-    def getContactUIDForUser(self,context):
-        """get the UID of the contact associated with batch parent"""
-	print"==================================================================getContactUID"
-	return self.aq_parent.getContact().UID
 
+    def getContactUIDForUser(self):
+        """get the UID of the contact associated with the authenticated user
+        """
+	print "getContact AR===================================================="
+        return self.aq_parent.getContact.UID
 
     security.declarePublic('current_date')
+
     def current_date(self):
-        """return current date """
-	return DateTime()
+        """return current date
+        """
+        # noinspection PyCallingNonCallable
+        return DateTime()
+
 
 
     def getQCAnalyses(self, qctype=None, review_state=None):
