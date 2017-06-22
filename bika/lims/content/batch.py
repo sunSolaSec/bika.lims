@@ -35,14 +35,7 @@ from Products.CMFCore import permissions
 from Products.CMFCore.permissions import View
 import sys
 
-from bika.lims.browser.widgets import ReferenceWidget as ref
-from bika.lims.browser.widgets import SelectionWidget
-
-from Products.Archetypes.atapi import StringField
-from Products.Archetypes.atapi import StringWidget
-
-
-from bika.lims.workflow import isBasicTransitionAllowed
+import pdb
 
 
 
@@ -153,7 +146,7 @@ schema = BikaFolderSchema.copy() + Schema((
             label=_("Imputation"),
             size=40,
             visible=True,
-            base_query={'ClientUID':'here.aq_parent.UID'},
+            base_query={'ClientUID':"context.getClient().UID() if context.getClient() else ''"},
             showOn=True,
             colModel=[{'columnName': 'UID', 'hidden': True},
                       {'columnName': 'Title', 'width': '60', 'label': _('Title')},
@@ -313,6 +306,7 @@ class Batch(ATFolder):
 
     security.declarePublic('current_date')
     def current_date(self):
+	#pdb.set_trace()
 	return DateTime()
 
     def _renameAfterCreation(self, check_auto_id=False):
