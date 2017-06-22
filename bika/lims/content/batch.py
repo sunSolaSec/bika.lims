@@ -24,7 +24,7 @@ from bika.lims.permissions import EditBatch
 from plone.indexer import indexer
 from Products.Archetypes.references import HoldingReference
 from Products.ATExtensions.ateapi import RecordsField
-from bika.lims.browser.widgets import RecordsWidget as bikaRecordsWidget
+from bika.lims.browser.widgets import RecordsWidget as bikaRecordsWidget,ReferenceWidget as Ref
 from bika.lims.browser.fields import DurationField
 from bika.lims.browser.widgets.durationwidget import DurationWidget
 
@@ -36,8 +36,7 @@ from Products.CMFCore.permissions import View
 import sys
 
 import pdb
-
-
+import json
 
 class InheritedObjectsUIField(RecordsField):
 
@@ -86,7 +85,7 @@ schema = BikaFolderSchema.copy() + Schema((
         required=1,
         allowed_types=('Client',),
         relationship='BatchClient',
-	widget=ReferenceWidget(
+	widget=Ref(
             label=_("Client"),
             size=40,
             visible=True,
@@ -120,11 +119,9 @@ schema = BikaFolderSchema.copy() + Schema((
         relationship='BatchContact',
         mode="rw",
         read_permission=permissions.View,\
-        widget=ReferenceWidget(
+        widget=Ref(
             label=_("Contact"),
             size=40,
-            helper_js=("bika_widgets/referencewidget.js",
-                       "++resource++bika.lims.js/contact.js"),
             visible=True,
             showOn=True,
             popup_width='400px',
@@ -142,11 +139,11 @@ schema = BikaFolderSchema.copy() + Schema((
         required=0,
         allowed_types=('Imputation',),
         relationship='BatchImputation',
-	widget=ReferenceWidget(
+	widget=Ref(
             label=_("Imputation"),
             size=40,
             visible=True,
-            base_query={'ClientUID':"context.getClient().UID() if context.getClient() else ''"},
+            base_query='dynamicBaseQuery',
             showOn=True,
             colModel=[{'columnName': 'UID', 'hidden': True},
                       {'columnName': 'Title', 'width': '60', 'label': _('Title')},
@@ -228,7 +225,7 @@ schema = BikaFolderSchema.copy() + Schema((
 	allowed_types=('AnalysisRequest'),  # batches are expanded on save
         referenceClass = HoldingReference,
         relationship = 'BatchInheritedObjects',
-        widget=ReferenceWidget(
+        widget=Ref(
             visible=False,
         ),
     ),
@@ -306,7 +303,6 @@ class Batch(ATFolder):
 
     security.declarePublic('current_date')
     def current_date(self):
-	#pdb.set_trace()
 	return DateTime()
 
     def _renameAfterCreation(self, check_auto_id=False):
@@ -331,12 +327,24 @@ class Batch(ATFolder):
             found, searches for linked ARs and retrieve the Client from the
             first one. If the Batch has no client, returns None.
         """
+	#pdb.set_trace()
         client = self.Schema().getField('Client').get(self)
-        if client:
+	if client:
+	    print "call me "+client.UID()
 	    return client
         client = self.aq_parent
+	print "call me "+client.UID()
 	if IClient.providedBy(client):
             return client
+
+
+    def dynamicBaseQuery(self):
+	print "===================="
+	client=self.getClient().UID()
+	your_json= '["ClientUID": "self.getClient().UID()"]'
+	# i tried {"ClientUID": "self.getClient().UID()"} it give same error
+	return json.loads(your_json)
+
 
     def getClientTitle(self):
         client = self.getClient()
@@ -403,6 +411,7 @@ class Batch(ATFolder):
                getUsername=user_id)
         if len(r) == 1:
             return r[0].UID
+
 
     def BatchLabelVocabulary(self):
         """ return all batch labels """

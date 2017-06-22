@@ -119,9 +119,6 @@ class ReferenceWidget(StringWidget):
 
     def get_base_query(self, context, fieldName):
         base_query = self.base_query
-	print "query :"+str(base_query)
-	print "element :"+str(fieldName)
-	print "contexte"+str(self.aq_parent.UID)
             
         if callable(base_query):
 	    base_query = base_query()

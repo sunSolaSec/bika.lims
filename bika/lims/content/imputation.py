@@ -200,7 +200,7 @@ class Imputation(Item):
     
     def getClientUID(self):
 	print "the client UID is :"+ self.aq_parent.aq_parent.UID()+"="+ self.aq_parent.aq_parent.Title()
-        return self.aq_parent.UID()
+        return self.aq_parent.aq_parent.UID()
 
 
 
