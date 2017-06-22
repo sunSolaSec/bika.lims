@@ -22,7 +22,7 @@
              src="" tal:attributes="src view/getPriorityIcon"/>
         <span style="position:relative;top:-0.2em;" class="documentFirstHeading" tal:content="view/title"/>
         <tal:add_actions repeat="add_item python:view.context_actions.keys()">
-            <a tal:attributes="
+	    <a tal:attributes="
 				style python:'background: url(%s) 2px 50%% no-repeat'%(view.context_actions[add_item]['icon']);
 				href python:view.context_actions[add_item]['url'];
 				class python:'context_action_link %s' % (view.context_actions[add_item].get('class',''))">
@@ -31,7 +31,7 @@
             <input name="ar_count"
                    class="ar_count context_action_link"
                    type="number"
-                   value="4"
+                   value="10"
                    style="width:4em;border-radius:0;border:1px solid #ddd;padding:2px;"
                    tal:condition="python:len(view.context_actions) > 0"/>
             <a tal:attributes="
@@ -47,8 +47,28 @@
 	(function( $ ) {
 	$(document).ready(function(){
 		$('input.ar_count').change(function(){
-			url = $(".context_action_link").attr('href').split("?")[0];
-			$(".context_action_link").attr('href', url + "?ar_count="+$(this).val());
+			p1= $(".context_action_link").attr('href').split("&");
+			console.error('==============================================');
+			if(p1.length==1){
+				  p2=$(".context_action_link").attr('href').split("?");
+				  if(p2.length==1){
+					//document.write("One 1: "+p2[0]+"?ar_count="+$(this).val());
+					$(".context_action_link").attr('href', p2[0]+"?ar_count="+$(this).val());
+					}
+				  else{
+					//document.write("Two 1: "+p2[0] + "?ar_count="+$(this).val());
+				  	$(".context_action_link").attr('href', p2[0] + "?ar_count="+$(this).val());
+				  }
+			}
+			else{
+				  i=0;url="";
+				  while(i<(p1.length-1)){  
+				      url=url.concat(p1[i]);
+				      i++;
+				  }
+				  $(".context_action_link").attr('href', url + "&ar_count="+$(this).val());
+				  
+			}
 		});
 		$('input.ar_count').click(function(e){e.preventDefault();})
 		$('input.ar_count').change();

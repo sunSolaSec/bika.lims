@@ -44,7 +44,11 @@ class AnalysisRequestsView(BikaListingView):
                               'cancellation_state': 'active',
                               }
 
-        self.context_actions = {}
+        self.context_actions[self.context.translate(_('Add new'))] = {
+                'url': self.context.absolute_url() + \
+                    "/portal_factory/"
+                    "AnalysisRequest/Request new analyses/ar_add?ar_count=1",
+                'icon': '++resource++bika.lims.images/add.png'}
 
         if self.context.portal_type == "AnalysisRequestsFolder":
             self.request.set('disable_border', 1)

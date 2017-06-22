@@ -113,6 +113,7 @@ def isBasicTransitionAllowed(context, permission=None):
     normally be set in the guard_permission in workflow definition.
 
     """
+    print "isBasicTransitionAllowed"
     workflow = api.portal.get_tool("portal_workflow")
     mtool = api.portal.get_tool("portal_membership")
     if workflow.getInfoFor(context, "cancellation_state", "") == "cancelled" \

@@ -11,6 +11,7 @@ from datetime import date
 from Products.CMFCore.permissions import ModifyPortalContent, AddPortalContent
 
 from bika.lims.browser.fields import DurationField
+from plone.indexer import indexer
 
 class AnalysisProfiles(object):
     """Context source binder to provide a vocabulary of analysis profil.
@@ -101,9 +102,10 @@ class ContactsSecondaire(object):
 	terms = []
 	
 	for brain in brains:
-	    art_uid = brain.UID
+	    cs_uid = brain.UID
             title = brain.Title
-            terms.append(SimpleVocabulary.createTerm(art_uid, str(art_uid), title))
+	    print  "Title ========"+title+cs_uid 
+            terms.append(SimpleVocabulary.createTerm(cs_uid, str(cs_uid), title))
         return SimpleVocabulary(terms)
 
 
@@ -152,10 +154,53 @@ class IImputation(model.Schema):
                 source=ContactsSecondaire()
             )
         )
+
+@indexer(IImputation)
+def cccontacts(obj):
+    return obj.cccontacts()
+
+@indexer(IImputation)
+def aprofil(obj):
+    return obj.aprofil()
+
+@indexer(IImputation)
+def ClientUID(obj):
+    return obj.getClientUID()
 	
 class Imputation(Item):
     
     implements(IImputation)
+
+    def aprofil(self):
+        l = []
+        art_uids = self.analysis_profiles
+        # I have to get the catalog in this way because I can't do it with 'self'...
+        pc = getToolByName(api.portal.get(), 'uid_catalog')
+        for art_uid in art_uids:
+            art_obj = pc(UID=art_uid)
+            if len(art_obj) != 0:
+                l.append((art_obj[0].Title, art_uid))
+        return l
+
+    def cccontacts(self):
+        l = []
+        art_uids = self.contacts_p
+	cs_uids = self.contacts_s
+        # I have to get the catalog in this way because I can't do it with 'self'...
+        pc = getToolByName(api.portal.get(), 'uid_catalog')
+        for art_uid in art_uids:
+            art_obj = pc(UID=art_uid)
+	    if len(art_obj) != 0:
+                l.append((art_obj[0].Title, art_uid))
+	for cs_uid in cs_uids:
+            cs_obj = pc(UID=cs_uid)
+	    if len(cs_obj) != 0:
+                l.append((cs_obj[0].Title, cs_uid))
+        return l
+    
+    def getClientUID(self):
+	print "the client UID is :"+ self.aq_parent.aq_parent.UID()+"="+ self.aq_parent.aq_parent.Title()
+        return self.aq_parent.UID()
 
 
 

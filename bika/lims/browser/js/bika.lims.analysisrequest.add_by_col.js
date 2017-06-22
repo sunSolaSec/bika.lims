@@ -27,7 +27,7 @@
      * filter_by_client - Grab the client UID and filter all applicable dropdowns
      * get_arnum(element) - convenience to compensate for different form layouts.
      */
-    var _partition_indicators_set, analysis_cb_after_change, analysis_cb_check, analysis_cb_click, analysis_cb_uncheck, category_header_clicked, category_header_expand_handler, cc_contacts_deletebtn_click, cc_contacts_set, checkbox_change, checkbox_change_handler, client_selected, composite_selected, contact_selected, copybutton_selected, dependancies_add_yes, dependants_remove_confirm, dependants_remove_no, dependants_remove_yes, dependencies_add_confirm, dependencies_add_no, deps_calc, destroy, drymatter_selected, drymatter_set, drymatter_unset, expand_services_bika_listing, expand_services_singleservice, filter_by_client, filter_combogrid, fix_table_layout, form_init, form_submit, from_sampling_round, get_arnum, hash_to_hashes, hashes_to_hash, partition_indicators_set, partnrs_calc, profile_selected, profile_set, profile_unset_trigger, profiles_unset_all, recalc_prices, referencewidget_change, referencewidget_change_handler, rejectionwidget_change, rejectionwidget_change_handler, sample_selected, sample_set, samplepoint_selected, samplepoint_set, sampletype_selected, sampletype_set, select_element_change, select_element_change_handler, set_spec_from_sampletype, set_state_from_form_values, setupSamplingRoundInfo, singleservice_deletebtn_click, singleservice_dropdown_init, singleservice_duplicate, spec_field_entry, spec_filter_on_sampletype, spec_selected, specification_apply, specification_refetch, state_analyses_push, state_analyses_remove, state_set, template_selected, template_set, template_unset, textarea_change, textarea_change_handler, textinput_change, textinput_change_handler, that, uncheck_all_services, unset_profile_analysis_services;
+    var _partition_indicators_set, analysis_cb_after_change, analysis_cb_check, analysis_cb_click, analysis_cb_uncheck, category_header_clicked, category_header_expand_handler, cc_contacts_deletebtn_click, cc_contacts_set, cc_contacts_set_imp, checkbox_change, checkbox_change_handler, client_selected, composite_selected, contact_selected, copybutton_selected, dependancies_add_yes, dependants_remove_confirm, dependants_remove_no, dependants_remove_yes, dependencies_add_confirm, dependencies_add_no, deps_calc, destroy, drymatter_selected, drymatter_set, drymatter_unset, expand_services_bika_listing, expand_services_singleservice, filter_by_client, filter_combogrid, fix_table_layout, form_init, form_submit, from_batch, from_sampling_round, get_arnum, hash_to_hashes, hashes_to_hash, partition_indicators_set, partnrs_calc, profile_selected, profile_set, profile_unset_trigger, profiles_unset_all, recalc_prices, referencewidget_change, referencewidget_change_handler, rejectionwidget_change, rejectionwidget_change_handler, sample_selected, sample_set, samplepoint_selected, samplepoint_set, sampletype_selected, sampletype_set, select_element_change, select_element_change_handler, set_spec_from_sampletype, set_state_from_form_values, setupBatchInfo, setupSamplingRoundInfo, singleservice_deletebtn_click, singleservice_dropdown_init, singleservice_duplicate, spec_field_entry, spec_filter_on_sampletype, spec_selected, specification_apply, specification_refetch, state_analyses_push, state_analyses_remove, state_set, template_selected, template_set, template_unset, textarea_change, textarea_change_handler, textinput_change, textinput_change_handler, that, uncheck_all_services, unset_profile_analysis_services;
     form_init = function() {
 
       /* load-time form configuration
@@ -114,11 +114,14 @@
         }
         $(div).attr('id', 'archetypes-fieldname-' + fieldname + '-' + arnum);
       });
-
-      /*
-      
-      console.debug "=================================="
-       */
+      $('#singleservice').val('');
+      $('#singleservice').attr('uid', 'new');
+      $('#singleservice').attr('title', '');
+      $('#singleservice').parents('[uid]').attr('uid', 'new');
+      $('#singleservice').parents('[keyword]').attr('keyword', '');
+      $('#singleservice').parents('[title]').attr('title', '');
+      $('input[type=\'checkbox\']').removeAttr('checked');
+      $('.min,.max,.error').val('');
       setTimeout((function() {
         nr_ars = parseInt($('#ar_count').val(), 10);
         arnum = 0;
@@ -169,7 +172,7 @@
     };
     state_set = function(arnum, fieldname, value) {
       var arnum_i;
-      console.info("state_set_Souad::" + fieldname + " -> " + value);
+      console.info("state_set::" + fieldname + " -> " + value);
 
       /* Use this function to set values in the state variable.
        */
@@ -728,6 +731,7 @@
             ob = data.objects[0];
             cc_titles = ob['CCContact'];
             cc_uids = ob['CCContact_uid'];
+            console.info("uid contact :" + cc_uids);
             if (!cc_uids) {
               return;
             }
@@ -2298,8 +2302,117 @@
     };
     'use strict';
     that = this;
+    from_batch = function() {
+      var batch_UID, i, sPageURL, sParameterName, sURLVariables;
+      sPageURL = decodeURIComponent(window.location.search.substring(1));
+      sURLVariables = sPageURL.split('&');
+      sParameterName = void 0;
+      i = 0;
+      while (i < sURLVariables.length) {
+        sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] === 'batch') {
+          batch_UID = sParameterName[1];
+          setupBatchInfo(batch_UID);
+        }
+        i++;
+      }
+    };
+    setupBatchInfo = function(batch_UID) {
+
+      /**
+       * This function sets up the batch information to analysis request
+       * :batch_UID: a string with the batch uid
+       */
+      var request_data;
+      console.info("is a batch request");
+      request_data = {
+        catalog_name: 'portal_catalog',
+        portal_type: 'Batch',
+        UID: batch_UID,
+        include_fields: ['Title', 'UID', 'ContactUID', 'Contact', 'Imputation', 'ImputationUID', 'CContact']
+      };
+      window.bika.lims.jsonapi_read(request_data, function(data) {
+        var c, i, im, nr_ars, spec, to_disable;
+        if (data.objects.length > 0) {
+          spec = data.objects[0];
+          c = $('input[id^="Batch"]');
+          c.attr('uid', spec['UID']).val(spec['Title']).attr('uid_check', spec).attr('val_check', spec['Title']).attr('disabled', 'disabled');
+          $('[id^="Contact-"][id$="_uid"]').val(spec['Batch']);
+          c = $('input[id^="Contact"]');
+          c.attr('uid', spec['ContactUID']).val(spec['Contact']).attr('uid_check', spec).attr('val_check', spec['Contact']).attr('disabled', 'disabled');
+          $('[id^="Contact-"][id$="_uid"]').val(spec['Contact']);
+          im = $('input[id^="Imputation"]');
+          im.attr('uid', spec['ImputationUID']).val(spec['Imputation']).attr('uid_check', spec).attr('val_check', spec['Imputation']).attr('disabled', 'disabled');
+          $('[id^="Contact-"][id$="_uid"]').val(spec['Imputation']);
+          i = 0;
+          nr_ars = parseInt($('input[id="ar_count"]').val(), 10);
+          while (i < nr_ars) {
+            console.info("in");
+            state_set(i, 'Impuation', spec['ImputationUID']);
+            cc_contacts_set(i);
+            i++;
+          }
+          im = $('input[id^="CCContact"]');
+          to_disable = ['SamplingRound', 'Template', 'SamplingDeviation', 'SampleCondition', 'EnvironmentConditions', 'InvoiceInclude', 'SamplePoint', 'Sample', 'Batch', 'SubGroup', 'SamplingDate', 'Composite', 'DefaultContainerType', 'AdHoc'];
+          i = 0;
+          while (to_disable.length > i) {
+            $('tr[fieldname="' + to_disable[i] + '"]').hide();
+            i++;
+          }
+        }
+      });
+    };
+    cc_contacts_set_imp = function(arnum) {
+
+      /* Setting the CC Contacts after a Imp was set
+       *
+       * Contact.CCContact may contain a list of Contact references.
+       * So we need to select them in the form with some fakey html,
+       * and set them in the state.
+       */
+      var cc_div, cc_uid_element, imputation_element, imputation_uid, request_data, td;
+      td = $('tr[fieldname=\'Imputation\']');
+      imputation_element = $(td).find('input[type=\'text\']')[0];
+      imputation_uid = $(imputation_element).attr('uid');
+      cc_div = $('tr[fieldname=\'CCContact\'] td[arnum=\'' + arnum + '\'] .multiValued-listing');
+      cc_uid_element = $('#CCContact-' + arnum + '_uid');
+      $(cc_div).empty();
+      $(cc_uid_element).empty();
+      if (imputation_uid) {
+        request_data = {
+          catalog_name: 'portal_catalog',
+          portal_type: 'Imputation',
+          include_fields: ['Title', 'UID', 'aprofil', 'cccontacts'],
+          UID: imputation_uid
+        };
+        window.bika.lims.jsonapi_read(request_data, function(data) {
+          var cc_titles, del_btn, del_btn_src, i, l, new_item, ob, title, uid;
+          if (data.objects && data.objects.length > 0) {
+            ob = data.objects[0];
+            cc_titles = ob['cccontacts'];
+            i = 0;
+            if (!cc_titles) {
+              return;
+            }
+            l = [];
+            while (i <= cc_titles.length / 2) {
+              title = cc_titles[i][0];
+              uid = cc_titles[i][1];
+              del_btn_src = window.portal_url + '/++resource++bika.lims.images/delete.png';
+              del_btn = '<img class=\'deletebtn\' data-contact-title=\'' + title + '\' src=\'' + del_btn_src + '\' fieldname=\'CCContact\' uid=\'' + uid + '\'/>';
+              new_item = '<div class=\'reference_multi_item\' uid=\'' + uid + '\'>' + del_btn + title + '</div>';
+              $(cc_div).append($(new_item));
+              l.push(cc_titles[i][1]);
+              i++;
+            }
+            console.info("state changed");
+            state_set(arnum, 'CCContact', l.join(','));
+          }
+        });
+      }
+    };
     that.load = function() {
-      console.debug("*** LOADING AR FORM CONTROLLER SOO***");
+      console.debug("*** LOADING AR FORM CONTROLLER ***");
       $('input[type=text]').prop('autocomplete', 'off');
       form_init();
 
@@ -2335,6 +2448,7 @@
       category_header_clicked();
       form_submit();
       fix_table_layout();
+      from_batch();
       from_sampling_round();
     };
 

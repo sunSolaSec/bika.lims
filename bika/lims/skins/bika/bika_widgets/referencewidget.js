@@ -48,7 +48,7 @@ function destroy(arr, val) {
 function referencewidget_lookups(elements) {
 	// Any reference widgets that don't already have combogrid widgets
 	var inputs;
-	if (elements === undefined) {
+ 	if (elements === undefined) {
 		inputs = $(".ArchetypesReferenceWidget [combogrid_options]").not(".has_combogrid_widget");
 	}
 	else {

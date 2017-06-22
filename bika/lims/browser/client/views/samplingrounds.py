@@ -25,6 +25,7 @@ class ClientSamplingRoundsView(SamplingRoundsView):
                 "level": 0},
         }
         self.title = self.context.translate(_("Client Sampling Rounds"))
+	
         self.context_actions = {
             _('Add'): {'url': '++add++SamplingRound',  # To work with dexterity
                        'icon': '++resource++bika.lims.images/add.png'}}

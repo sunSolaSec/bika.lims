@@ -136,11 +136,14 @@ window.AnalysisRequestAddByCol = ->
 
     # clear existing values (on page reload).
     # XXX: Where is this #singleservice element?
-    ###
-    
-    console.debug "=================================="
-    ###
-    
+    $('#singleservice').val ''
+    $('#singleservice').attr 'uid', 'new'
+    $('#singleservice').attr 'title', ''
+    $('#singleservice').parents('[uid]').attr 'uid', 'new'
+    $('#singleservice').parents('[keyword]').attr 'keyword', ''
+    $('#singleservice').parents('[title]').attr 'title', ''
+    $('input[type=\'checkbox\']').removeAttr 'checked'
+    $('.min,.max,.error').val ''
 
     # filter fields based on the selected Client
     # we need a little delay here to be sure the elements have finished
@@ -196,7 +199,7 @@ window.AnalysisRequestAddByCol = ->
 
 
   state_set = (arnum, fieldname, value) ->
-    console.info "state_set_Souad::#{fieldname} -> #{value}"
+    console.info "state_set::#{fieldname} -> #{value}"
 
     ### Use this function to set values in the state variable.
     ###
@@ -820,6 +823,8 @@ window.AnalysisRequestAddByCol = ->
           ob = data.objects[0]
           cc_titles = ob['CCContact']
           cc_uids = ob['CCContact_uid']
+          console.info("uid contact :#{cc_uids}")
+          
           if !cc_uids
             return
           $(cc_uid_element).val cc_uids.join(',')
@@ -2487,10 +2492,183 @@ window.AnalysisRequestAddByCol = ->
   that = this
 
 
-#===================================================================================================================================================
+
+
+
+#================================ Batch ===========================================
+
+  from_batch= ->
+    # Checking if the request comes from a batch
+    sPageURL = decodeURIComponent(window.location.search.substring(1))
+    sURLVariables = sPageURL.split('&')
+    sParameterName = undefined
+    i = 0
+    while i < sURLVariables.length
+      sParameterName = sURLVariables[i].split('=')
+      if sParameterName[0] == 'batch'
+        # If the request comes from a batch, we have to set up the form with the batch info
+        batch_UID = sParameterName[1]
+        setupBatchInfo batch_UID
+      i++
+    return
+
+
+  setupBatchInfo = (batch_UID) ->
+    ###*
+    # This function sets up the batch information to analysis request
+    # :batch_UID: a string with the batch uid
+    ###
+    console.info("is a batch request")
+    request_data =
+      catalog_name: 'portal_catalog'
+      portal_type: 'Batch'
+      UID: batch_UID
+      include_fields: [
+        'Title'
+        'UID'
+        'ContactUID'
+        'Contact'
+        'Imputation'
+        'ImputationUID'
+        'CContact'
+      ]
+
+    window.bika.lims.jsonapi_read request_data, (data) ->
+      if data.objects.length > 0
+        spec = data.objects[0]
+  
+    # Selecting the Batch
+        c = $('input[id^="Batch"]')
+        # Filling out and halting Batch fields
+        c.attr('uid', spec['UID']).val(spec['Title']).attr('uid_check', spec).attr('val_check', spec['Title']).attr 'disabled', 'disabled'
+        $('[id^="Contact-"][id$="_uid"]').val spec['Batch']
+
+    # Selecting the contact
+        c = $('input[id^="Contact"]')
+        # Filling out and halting contact fields
+        c.attr('uid', spec['ContactUID']).val(spec['Contact']).attr('uid_check', spec).attr('val_check', spec['Contact']).attr 'disabled', 'disabled'
+        $('[id^="Contact-"][id$="_uid"]').val spec['Contact']
+
+    # Selecting the Imputation
+        im = $('input[id^="Imputation"]')
+        # Filling out and halting Imputaion fields
+        im.attr('uid', spec['ImputationUID']).val(spec['Imputation']).attr('uid_check', spec).attr('val_check', spec['Imputation']).attr 'disabled', 'disabled'
+        $('[id^="Contact-"][id$="_uid"]').val spec['Imputation']
+
+
+    # Filling out CContacts
+        i=0
+        nr_ars = parseInt($('input[id="ar_count"]').val(), 10)
+        while i<nr_ars
+          console.info("in")
+          state_set i, 'Impuation', spec['ImputationUID']
+          cc_contacts_set i
+          i++
+        im = $('input[id^="CCContact"]')
+        #im.attr 'disabled', 'disabled'
+
+    # Filling out AP
+	###
+        #uid = $($('tr[fieldname=\'Client\'] td[arnum=\'' + arnum + '\'] input')[0]).attr('uid')
+        #uids = [
+        #       uid
+        #       $('#bika_setup').attr('bika_analysisprofiles_uid')
+        #    ]
+    	#element = $('tr[fieldname=Profiles] td[arnum=' + arnum + '] input')[0]
+    	#filter_combogrid element, 'getClientUID', uids
+	###
+  
+        # Hiding all fields which depends on the sampling round
+        to_disable = [
+          'SamplingRound'
+          'Template'
+          'SamplingDeviation'
+          'SampleCondition'
+          'EnvironmentConditions'
+          'InvoiceInclude'
+          'SamplePoint'
+          'Sample'
+          'Batch'
+          'SubGroup'
+          'SamplingDate'
+          'Composite'
+          'DefaultContainerType'
+          'AdHoc'
+        ]
+        i = 0
+        while to_disable.length > i
+          $('tr[fieldname="' + to_disable[i] + '"]').hide()
+          i++
+  
+      return
+    return
+
+
+  cc_contacts_set_imp = (arnum) ->
+
+    ### Setting the CC Contacts after a Imp was set
+    #
+    # Contact.CCContact may contain a list of Contact references.
+    # So we need to select them in the form with some fakey html,
+    # and set them in the state.
+    ###
+
+    td = $('tr[fieldname=\'Imputation\']')
+    imputation_element = $(td).find('input[type=\'text\']')[0]
+    imputation_uid = $(imputation_element).attr('uid')
+    #console.info("cc_imp_uid  #{imputation_uid}")
+
+    # clear the CC selector widget and listing DIV
+    cc_div = $('tr[fieldname=\'CCContact\'] td[arnum=\'' + arnum + '\'] .multiValued-listing')
+    cc_uid_element = $('#CCContact-' + arnum + '_uid')
+    $(cc_div).empty()
+    $(cc_uid_element).empty()
+
+    if imputation_uid
+      request_data =
+        catalog_name: 'portal_catalog'
+        portal_type: 'Imputation'
+        include_fields: [
+          'Title'
+          'UID'
+          'aprofil'
+          'cccontacts'
+        ]
+        UID: imputation_uid
+      
+      window.bika.lims.jsonapi_read request_data, (data) ->
+        if data.objects and data.objects.length > 0
+          ob = data.objects[0]
+          cc_titles = ob['cccontacts']
+          
+          i = 0
+          if !cc_titles
+            return
+          l=[]
+          while i <= cc_titles.length/2
+            title = cc_titles[i][0]
+            uid = cc_titles[i][1]
+            #$(cc_uid_element).val cc_titles[i].join(',')
+
+            del_btn_src = window.portal_url + '/++resource++bika.lims.images/delete.png'
+            del_btn = '<img class=\'deletebtn\' data-contact-title=\'' + title + '\' src=\'' + del_btn_src + '\' fieldname=\'CCContact\' uid=\'' + uid + '\'/>'
+            new_item = '<div class=\'reference_multi_item\' uid=\'' + uid + '\'>' + del_btn + title + '</div>'
+            $(cc_div).append $(new_item)
+            l.push(cc_titles[i][1])
+            i++
+
+          console.info("state changed")
+          state_set arnum, 'CCContact', l.join(',')
+          
+        return
+    return
+
+  
+  
+
 
   that.load = ->
-    console.debug "*** LOADING AR FORM CONTROLLER SOO***"
+    console.debug "*** LOADING AR FORM CONTROLLER ***"
 
     # disable browser autocomplete
     $('input[type=text]').prop 'autocomplete', 'off'
@@ -2543,6 +2721,7 @@ window.AnalysisRequestAddByCol = ->
     #      sample_selected()
     form_submit()
     fix_table_layout()
+    from_batch()
     from_sampling_round()
     return
 

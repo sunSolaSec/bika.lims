@@ -16,7 +16,7 @@
         form_id view/form_id;
         table_only python:hasattr(view, 'table_only') and view.table_only or view.request.get('table_only','') == form_id;"
     tal:condition="python:not table_only">
-    <h1>
+    <h1>ADDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
         <img tal:condition="view/icon | nothing"
              src="" tal:attributes="src view/icon"/>
         <span style="position:relative;top:-0.2em;" class="documentFirstHeading" tal:content="view/title"/>

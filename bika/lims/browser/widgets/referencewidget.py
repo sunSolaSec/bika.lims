@@ -116,13 +116,18 @@ class ReferenceWidget(StringWidget):
         }
         return json.dumps(options)
 
+
     def get_base_query(self, context, fieldName):
         base_query = self.base_query
+	print "query :"+str(base_query)
+	print "element :"+str(fieldName)
+	print "contexte"+str(self.aq_parent.UID)
+            
         if callable(base_query):
-            base_query = base_query()
+	    base_query = base_query()
         if base_query and isinstance(base_query, basestring):
             base_query = json.loads(base_query)
-
+	    
         # portal_type: use field allowed types
         field = context.Schema().getField(fieldName)
         allowed_types = getattr(field, 'allowed_types', None)
@@ -134,8 +139,9 @@ class ReferenceWidget(StringWidget):
         base_query['portal_type'] = allowed_types \
             if allowed_types \
             else self.portal_types
-
         return json.dumps(self.base_query)
+
+
 
     def initial_uid_field_value(self, value):
         if type(value) in (list, tuple):

@@ -101,6 +101,7 @@ class LabContact(Contact):
 
     def Title(self):
         """ Return the contact's Fullname as title """
+	print "TITLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"+str(safe_unicode(self.getFullname()).encode('utf-8'))+"ee"
         return safe_unicode(self.getFullname()).encode('utf-8')
 
     def hasUser(self):

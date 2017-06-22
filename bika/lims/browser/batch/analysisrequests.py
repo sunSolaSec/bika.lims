@@ -17,13 +17,14 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from zope.interface import implements
 
 
+
 class AnalysisRequestsView(_ARV, _ARAV):
-    template = ViewPageTemplateFile(
-        "../analysisrequest/templates/analysisrequests.pt")
+
     ar_add = ViewPageTemplateFile("../analysisrequest/templates/ar_add.pt")
     implements(IViewView)
 
     def __init__(self, context, request):
+	self.ar_count=10
         super(AnalysisRequestsView, self).__init__(context, request)
 
     def contentsMethod(self, contentFilter):
@@ -36,9 +37,8 @@ class AnalysisRequestsView(_ARV, _ARAV):
             self.context_actions[self.context.translate(_('Add new'))] = {
                 'url': self.context.absolute_url() + \
                     "/portal_factory/"
-                    "AnalysisRequest/Request new analyses/ar_add?ar_count=1",
+                    "AnalysisRequest/Request new analyses/ar_add?batch="+self.context.UID()+"&ar_count=1",
                 'icon': '++resource++bika.lims.images/add.png'}
-
         return super(AnalysisRequestsView, self).__call__()
 
     def getMemberDiscountApplies(self):

@@ -22,6 +22,9 @@
     <adapter name="sortable_title" factory=".analysiscategory.sortable_title_with_sort_key" />
     <adapter name="sortable_title" factory=".analysisservice.sortable_title_with_sort_key" />
     <adapter name="sortable_title" factory=".analysis.sortable_title_with_sort_key" />
+    <adapter name="cccontacts" factory=".imputation.cccontacts" />
+    <adapter name="aprofil" factory=".imputation.aprofil" />
+    <adapter name="ClientUID" factory=".imputation.ClientUID" />
 
     <subscriber
       for="bika.lims.interfaces.IPricelist

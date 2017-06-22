@@ -25,6 +25,7 @@ class AnalysisRequestsView(_ARV, _ARAV):
         super(AnalysisRequestsView, self).__init__(context, request)
         self.catalog = "portal_catalog"
         SamplingWorkflowEnabled = self.context.bika_setup.getSamplingWorkflowEnabled()
+	
         self.columns = {
             'partition': {'title': _('Partition ID'),
                           'toggle': True},
@@ -272,10 +273,13 @@ class AnalysisRequestsView(_ARV, _ARAV):
             self.context_actions[self.context.translate(_('Add new'))] = {
                 'url': self.context.aq_parent.absolute_url() + \
                     "/portal_factory/"
-                    "AnalysisRequest/Request new analyses/ar_add?samplinground="
+                    "AnalysisRequest/Request analyses/ar_add?samplinground="
                     + self.context.UID() + "&ar_count=" + str(num_art),
                 'icon': '++resource++bika.lims.images/add.png'}
         return super(AnalysisRequestsView, self).__call__()
+
+
+
 
     def folderitems(self, full_objects=True):
         # In sampling rounds, analysis request list will be listed per Sample Partition/Container

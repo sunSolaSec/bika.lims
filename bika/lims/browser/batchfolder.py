@@ -45,8 +45,9 @@ class BatchFolderContentsView(BikaListingView):
             'Title': {'title': _('Title')},
             'BatchID': {'title': _('Batch ID')},
             'Description': {'title': _('Description')},
-            'BatchDate': {'title': _('Date')},
+            'BatchDate': {'title': _('Date of creation')},
             'Client': {'title': _('Client')},
+	    'BatchTimeLeft': {'title': _('Time left')},
             'state_title': {'title': _('State'), 'sortable': False},
         }
 
@@ -58,6 +59,7 @@ class BatchFolderContentsView(BikaListingView):
              'columns': ['Title',
                          'BatchID',
                          'BatchDate',
+			 'BatchTimeLeft',
                          'Client',
                          'Description',
                          'state_title', ]
@@ -69,6 +71,7 @@ class BatchFolderContentsView(BikaListingView):
              'columns': ['Title',
                          'BatchID',
                          'BatchDate',
+			 'BatchTimeLeft',
                          'Client',
                          'Description',
                          'state_title', ]
@@ -80,6 +83,7 @@ class BatchFolderContentsView(BikaListingView):
              'columns': ['Title',
                          'BatchID',
                          'BatchDate',
+			 'BatchTimeLeft',
                          'Client',
                          'Description',
                          'state_title', ]
@@ -90,6 +94,7 @@ class BatchFolderContentsView(BikaListingView):
              'columns': ['Title',
                          'BatchID',
                          'BatchDate',
+		         'BatchTimeLeft',
                          'Client',
                          'Description',
                          'state_title', ]
@@ -97,14 +102,7 @@ class BatchFolderContentsView(BikaListingView):
         ]
 
     def __call__(self):
-        if self.context.absolute_url() == self.portal.batches.absolute_url():
-            # in contexts other than /batches, we do want to show the edit border
-            self.request.set('disable_border', 1)
-        if self.context.absolute_url() == self.portal.batches.absolute_url() \
-        and self.portal_membership.checkPermission(AddBatch, self.portal.batches):
-            self.context_actions[_('Add')] = \
-                {'url': 'createObject?type_name=Batch',
-                 'icon': self.portal.absolute_url() + '/++resource++bika.lims.images/add.png'}
+        #print "call BatchFolderContentsView call() "
         return super(BatchFolderContentsView, self).__call__()
 
     def isItemAllowed(self, obj):

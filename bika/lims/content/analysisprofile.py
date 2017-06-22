@@ -35,7 +35,19 @@ schema = BikaSchema.copy() + Schema((
                           "not be the same as any Calculation Interim field ID."),
         ),
     ),
-    ReferenceField('Service',
+   
+    ReferenceField('SampleType',
+        schemata = 'Analyses',
+        required = 1,
+        multiValued = 0,
+        allowed_types = ('SampleType',),
+        relationship = 'AnalysisProfileSampleType',
+        widget = SelectionWidget(
+            label = _("Type"),
+            description = _("type of sample"),
+        )
+    ),
+     ReferenceField('Service',
         schemata = 'Analyses',
         required = 1,
         multiValued = 1,

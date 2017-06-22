@@ -35,6 +35,15 @@ from Products.CMFCore import permissions
 from Products.CMFCore.permissions import View
 import sys
 
+from bika.lims.browser.widgets import ReferenceWidget as ref
+from bika.lims.browser.widgets import SelectionWidget
+
+from Products.Archetypes.atapi import StringField
+from Products.Archetypes.atapi import StringWidget
+
+
+from bika.lims.workflow import isBasicTransitionAllowed
+
 
 
 class InheritedObjectsUIField(RecordsField):
@@ -102,20 +111,22 @@ schema = BikaFolderSchema.copy() + Schema((
         searchable=True,
         expression='here.getClient().UID()',        
 	widget=ComputedWidget(
-            visible=False,
+            visible=True,
         ),
     ),
+  
+
 
     ReferenceField(
         'Contact',
-        required=0,
+        required=1,
         default_method='getContactUIDForUser',
         vocabulary_display_path_bound=sys.maxsize,
         allowed_types=('Contact',),
         referenceClass=HoldingReference,
         relationship='BatchContact',
         mode="rw",
-        read_permission=permissions.View,
+        read_permission=permissions.View,\
         widget=ReferenceWidget(
             label=_("Contact"),
             size=40,
@@ -132,25 +143,22 @@ schema = BikaFolderSchema.copy() + Schema((
                       ],
         ),
     ),
-    ReferenceField(
+    
+     ReferenceField(
         'Imputation',
         required=0,
-        vocabulary_display_path_bound=sys.maxsize,
-        allowed_types=('Imputation'),
+        allowed_types=('Imputation',),
         relationship='BatchImputation',
-        mode="rw",
-        read_permission=permissions.View,
-        widget=ReferenceWidget(
+	widget=ReferenceWidget(
             label=_("Imputation"),
             size=40,
             visible=True,
+            base_query={'ClientUID':'here.aq_parent.UID'},
             showOn=True,
-            popup_width='400px',
             colModel=[{'columnName': 'UID', 'hidden': True},
-                      {'columnName': 'number', 'width': '50',
-                       'label': _('number')},
-                      ],
-        ),
+                      {'columnName': 'Title', 'width': '60', 'label': _('Title')},
+                     ],
+      ),
     ),
 
     DateTimeField(
@@ -168,7 +176,7 @@ schema = BikaFolderSchema.copy() + Schema((
         'BatchDateLimit',
         required=False,
 	widget=DateTimeWidget(
-            label=_('Date limit pour le stockage'),
+            label=_('Date limit for Publication'),
 	    size=40,
         ),
     ),
@@ -180,18 +188,30 @@ schema = BikaFolderSchema.copy() + Schema((
         expression='self.getId()',
         widget=StringWidget(
             label=_("Batch ID"),
-	    visible=True,
+	    visible=False,
 	    size=40,
         )
     ),
-   
+     TextField(
+        'Remarks',
+        searchable=True,
+        default_content_type='text/x-web-intelligent',
+        allowable_content_types=('text/plain', ),
+        default_output_type="text/plain",
+        widget=TextAreaWidget(
+            macro="bika_widgets/remarks",
+            label=_('Remarks'),
+            append_only=True,
+        )
+    ),
+   #To remove================
     StringField(
         'ClientBatchID',
         searchable=True,
         required=0,
         widget=StringWidget(
             label=_("Client ID"),
-	    visible=True,
+	    visible=False,
 	    size=40,
         )
     ),
@@ -206,23 +226,13 @@ schema = BikaFolderSchema.copy() + Schema((
 	    visible=False,
         )
     ),
-    TextField(
-        'Remarks',
-        searchable=True,
-        default_content_type='text/x-web-intelligent',
-        allowable_content_types=('text/plain', ),
-        default_output_type="text/plain",
-        widget=TextAreaWidget(
-            macro="bika_widgets/remarks",
-            label=_('Remarks'),
-            append_only=True,
-        )
-    ),
+
+   
     ReferenceField(
         'InheritedObjects',
         required=0,
         multiValued=True,
-        allowed_types=('AnalysisRequest'),  # batches are expanded on save
+	allowed_types=('AnalysisRequest'),  # batches are expanded on save
         referenceClass = HoldingReference,
         relationship = 'BatchInheritedObjects',
         widget=ReferenceWidget(
@@ -280,6 +290,8 @@ schema = BikaFolderSchema.copy() + Schema((
             },
         ),
     ),
+
+ #================
 )
 )
 
@@ -288,7 +300,7 @@ schema['title'].required = False
 schema['title'].expression = 'self.getId()'
 schema['title'].widget.size = 10
 schema['description'].widget.visible = False
-schema['title'].widget.description = _("the Batch ID will be used by default.")
+schema['title'].widget.visible =False
 
 
 class Batch(ATFolder):
@@ -301,7 +313,7 @@ class Batch(ATFolder):
 
     security.declarePublic('current_date')
     def current_date(self):
-        return DateTime()
+	return DateTime()
 
     def _renameAfterCreation(self, check_auto_id=False):
         from bika.lims.idserver import renameAfterCreation
@@ -327,17 +339,9 @@ class Batch(ATFolder):
         """
         client = self.Schema().getField('Client').get(self)
         if client:
-            return client
+	    return client
         client = self.aq_parent
-        if IClient.providedBy(client):
-            return client
-
-    def getImputation(self):
-        client = self.Schema().getField('Client').get(self)
-        if client:
-            return client
-        client = self.aq_parent
-        if IClient.providedBy(client):
+	if IClient.providedBy(client):
             return client
 
     def getClientTitle(self):
@@ -398,7 +402,6 @@ class Batch(ATFolder):
         """ get the UID of the contact associated with the authenticated
             user
         """
-        print "===========================================getUIDForUSR"
         user = self.REQUEST.AUTHENTICATED_USER
         user_id = user.getUserName()
         pc = getToolByName(self, 'portal_catalog')
@@ -442,6 +445,12 @@ class Batch(ATFolder):
         labels = [label.getObject().title for label in uc(UID=uids)]
         return labels
 
+    def startDefaultValue():
+    	return datetime.datetime.today() + datetime.timedelta(7)
+	
+
+    #==============================================Guards
+
     def workflow_guard_open(self):
         """ Permitted if current review_state is 'closed' or 'cancelled'
             The open transition is already controlled by 'Bika: Reopen Batch'
@@ -453,6 +462,31 @@ class Batch(ATFolder):
         canstatus = getCurrentState(self, StateFlow.cancellation)
         return revstatus == BatchState.closed \
             and canstatus == CancellationState.active
+
+    def workflow_guard_send(self):
+        #TODO
+        print "submit batch"
+        return True
+   
+    def workflow_guard_receive(self):
+       #TODO
+       print "receive batch"
+       return True
+
+    def workflow_guard_receive_prepublish(self):
+ 	#TODO
+       print "prepublish batch"
+       return True
+
+    def workflow_guard_prepublish(self):
+ 	#TODO
+       print "prepublish batch"
+       return True
+   
+    def guard_cancelled_object(self):
+       #TODO
+       print "cancel to prepub"
+       return True
 
     def workflow_guard_close(self):
         """ Permitted if current review_state is 'open'.
@@ -466,10 +500,7 @@ class Batch(ATFolder):
         return revstatus == BatchState.open \
             and canstatus == CancellationState.active
     
-    def startDefaultValue():
-    	return datetime.datetime.today() + datetime.timedelta(7)
-
-
+   
 
 registerType(Batch, PROJECTNAME)
 

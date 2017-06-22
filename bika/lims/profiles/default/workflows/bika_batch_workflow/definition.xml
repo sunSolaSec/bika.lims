@@ -12,40 +12,23 @@
   <permission>BIKA: Close Batch</permission>
   <permission>BIKA: Edit Batch</permission>
   <permission>BIKA: Reopen Batch</permission>
+  <permission>BIKA: Send Batch</permission>
+  <permission>BIKA: Receive Batch</permission>
+  <permission>BIKA: Publish Batch</permission>
   <permission>Modify portal content</permission>
   <permission>View</permission>
 
-  <state state_id="closed" title="Closed" i18n:attributes="title">
-    <description>The batch can't be edited and Analysis Requests cannot be attached</description>
-    <exit-transition transition_id="open" />
-    <permission-map name="BIKA: Add Analysis Request" acquired="False">
-    </permission-map>
-    <permission-map name="BIKA: Close Batch" acquired="False">
-    </permission-map>
-    <permission-map name="BIKA: Edit Batch" acquired="False">
-    </permission-map>
-    <permission-map name="BIKA: Reopen Batch" acquired="False">
-      <permission-role>LabClerk</permission-role>
-      <permission-role>LabManager</permission-role>
-      <permission-role>Manager</permission-role>
-    </permission-map>
-    <permission-map name="Modify portal content" acquired="False">
-    </permission-map>
-    <permission-map name="View" acquired="False">
-      <permission-role>LabClerk</permission-role>
-      <permission-role>LabManager</permission-role>
-      <permission-role>Manager</permission-role>
-      <permission-role>RegulatoryInspector</permission-role>
-    </permission-map>
-  </state>
+ 
 
   <state state_id="open" title="Open" i18n:attributes="title">
     <description>The batch can be edited and Analysis Requests can be attached</description>
     <exit-transition transition_id="close" />
+    <exit-transition transition_id="send" />
     <permission-map name="BIKA: Add Analysis Request" acquired="False">
       <permission-role>LabClerk</permission-role>
       <permission-role>LabManager</permission-role>
       <permission-role>Manager</permission-role>
+      <permission-role>Client</permission-role>
     </permission-map>
     <permission-map name="BIKA: Close Batch" acquired="False">
       <permission-role>LabClerk</permission-role>
@@ -58,6 +41,21 @@
       <permission-role>Manager</permission-role>
     </permission-map>
     <permission-map name="BIKA: Reopen Batch" acquired="False">
+    </permission-map>
+    <permission-map name="Send Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Receive Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Publish Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
     </permission-map>
     <permission-map name="Modify portal content" acquired="False">
       <permission-role>LabClerk</permission-role>
@@ -74,13 +72,200 @@
     </permission-map>
   </state>
 
-  <transition transition_id="close" title="Close" new_state="closed" trigger="USER" before_script="" after_script="" i18n:attributes="title">
-    <action url="" category="workflow" icon="">Close</action>
-    <guard>
-      <guard-permission>BIKA: Close Batch</guard-permission>
-      <guard-expression>python:here.workflow_guard_close() if hasattr(here, 'workflow_guard_close') else True</guard-expression>
-    </guard>
-  </transition>
+  <state state_id="due" title="Due" i18n:attributes="title">
+    <description>The batch can be edited and Analysis Requests can be attached</description>
+    <exit-transition transition_id="receive" />
+    <exit-transition transition_id="cancel" />
+    <permission-map name="BIKA: Add Analysis Request" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+      <permission-role>Client</permission-role>
+    </permission-map>
+    <permission-map name="BIKA: Close Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="BIKA: Edit Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="BIKA: Reopen Batch" acquired="False">
+    </permission-map>
+    <permission-map name="Send Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Receive Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Publish Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Modify portal content" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="View" acquired="False">
+      <permission-role>Analyst</permission-role>
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+      <permission-role>RegulatoryInspector</permission-role>
+      <permission-role>Verifier</permission-role>
+    </permission-map>
+  </state>
+
+  <state state_id="received" title="Received" i18n:attributes="title">
+    <description>The batch can be edited and Analysis Requests can be attached</description>
+    <exit-transition transition_id="publish" />
+    <permission-map name="BIKA: Add Analysis Request" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+      <permission-role>Client</permission-role>
+    </permission-map>
+    <permission-map name="BIKA: Close Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="BIKA: Edit Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="BIKA: Reopen Batch" acquired="False">
+    </permission-map>
+    <permission-map name="Send Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Receive Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Publish Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Modify portal content" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="View" acquired="False">
+      <permission-role>Analyst</permission-role>
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+      <permission-role>RegulatoryInspector</permission-role>
+      <permission-role>Verifier</permission-role>
+    </permission-map>
+  </state>
+
+
+  <state state_id="published" title="Published" i18n:attributes="title">
+    <description>The batch can be edited and Analysis Requests can be attached</description>
+    <exit-transition transition_id="close" />
+    <exit-transition transition_id="republish" />
+    <permission-map name="BIKA: Add Analysis Request" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+      <permission-role>Client</permission-role>
+    </permission-map>
+    <permission-map name="BIKA: Close Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="BIKA: Edit Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="BIKA: Reopen Batch" acquired="False">
+    </permission-map>
+    <permission-map name="Send Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Receive Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Publish Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Modify portal content" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="View" acquired="False">
+      <permission-role>Analyst</permission-role>
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+      <permission-role>RegulatoryInspector</permission-role>
+      <permission-role>Verifier</permission-role>
+    </permission-map>
+  </state>
+
+ <state state_id="closed" title="Closed" i18n:attributes="title">
+    <description>The batch can't be edited and Analysis Requests cannot be attached</description>
+    <exit-transition transition_id="open" />
+    <permission-map name="BIKA: Add Analysis Request" acquired="False">
+    </permission-map>
+    <permission-map name="BIKA: Close Batch" acquired="False">
+    </permission-map>
+    <permission-map name="BIKA: Edit Batch" acquired="False">
+    </permission-map>
+    <permission-map name="BIKA: Reopen Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Send Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Receive Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Publish Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="Modify portal content" acquired="False">
+    </permission-map>
+    <permission-map name="View" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+      <permission-role>RegulatoryInspector</permission-role>
+    </permission-map>
+  </state>
 
   <transition transition_id="open" title="Open" new_state="open" trigger="USER" before_script="" after_script="" i18n:attributes="title">
     <action url="" category="workflow" icon="">Open</action>
@@ -89,6 +274,51 @@
       <guard-expression>python:here.workflow_guard_open() if hasattr(here, 'workflow_guard_open') else True</guard-expression>
     </guard>
   </transition>
+
+  <transition transition_id="send" title="Send" new_state="due" trigger="USER" before_script="" after_script="" i18n:attributes="title">
+    <action url="" category="workflow" icon="">Send Batch</action>
+    <guard>
+      <guard-permission>BIKA: Send Batch</guard-permission>
+      <guard-expression>python:here.workflow_guard_send()</guard-expression>
+    </guard>
+  </transition>
+
+  <transition transition_id="receive" title="Receive" new_state="received" trigger="USER" before_script="" after_script="" i18n:attributes="title">
+    <action url="" category="workflow" icon="">Receive Batch</action>
+    <guard>
+      <guard-permission>BIKA: Receive Batch</guard-permission>
+      <guard-expression>python:here.workflow_guard_receive()</guard-expression>
+    </guard>
+  </transition>
+
+  <transition transition_id="publish" title="Publish" new_state="published" trigger="USER" before_script="" after_script="" i18n:attributes="title">
+    <action url="" category="workflow" icon="">Publish Batch</action>
+    <guard>
+      <guard-permission>BIKA: Publish Batch</guard-permission>
+      <guard-expression></guard-expression>
+    </guard>
+  </transition> 
+
+  <transition transition_id="republish" title="Republish" new_state="" trigger="USER" before_script="" after_script="" i18n:attributes="title">
+    <action url="" category="workflow" icon="">Republish</action>
+    <guard>
+      <guard-permission>BIKA: Publish Batch</guard-permission>
+      <guard-expression></guard-expression>
+    </guard>
+  </transition>
+
+  <transition transition_id="close" title="Close" new_state="closed" trigger="USER" before_script="" after_script="" i18n:attributes="title">
+    <action url="" category="workflow" icon="">Close</action>
+    <guard>
+      <guard-permission>BIKA: Close Batch</guard-permission>
+      <guard-expression>python:here.workflow_guard_close() if hasattr(here, 'workflow_guard_close') else True</guard-expression>
+    </guard>
+  </transition>
+
+
+  
+
+  
 
   <variable variable_id="action" for_catalog="False" for_status="True" update_always="True">
     <description>Previous transition</description>
