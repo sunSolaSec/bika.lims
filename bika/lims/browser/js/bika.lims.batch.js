@@ -7,6 +7,7 @@ function BatchFolderView() {
 
     that.load = function() {
 
+	
         /**
          * Modal confirmation when user clicks on 'cancel' active button.
          * Used on batch folder views
@@ -57,3 +58,8 @@ function BatchFolderView() {
         });
     }
 }
+
+
+
+
+

@@ -36,17 +36,7 @@ schema = BikaSchema.copy() + Schema((
         ),
     ),
    
-    ReferenceField('SampleType',
-        schemata = 'Analyses',
-        required = 1,
-        multiValued = 0,
-        allowed_types = ('SampleType',),
-        relationship = 'AnalysisProfileSampleType',
-        widget = SelectionWidget(
-            label = _("Type"),
-            description = _("type of sample"),
-        )
-    ),
+   
      ReferenceField('Service',
         schemata = 'Analyses',
         required = 1,

@@ -35,7 +35,7 @@ from Products.CMFCore import permissions
 from Products.CMFCore.permissions import View
 import sys
 
-import pdb
+
 import json
 
 class InheritedObjectsUIField(RecordsField):
@@ -108,7 +108,6 @@ schema = BikaFolderSchema.copy() + Schema((
     ),
   
 
-
     ReferenceField(
         'Contact',
         required=1,
@@ -133,6 +132,15 @@ schema = BikaFolderSchema.copy() + Schema((
                       ],
         ),
     ),
+
+    ComputedField(
+        'ContactUID',
+        searchable=True,
+        expression='here.getContact().UID()',        
+	widget=ComputedWidget(
+            visible=True,
+        ),
+    ),
     
      ReferenceField(
         'Imputation',
@@ -143,13 +151,24 @@ schema = BikaFolderSchema.copy() + Schema((
             label=_("Imputation"),
             size=40,
             visible=True,
-            base_query='dynamicBaseQuery',
+            base_query={'inactive_state': 'active'},
             showOn=True,
             colModel=[{'columnName': 'UID', 'hidden': True},
                       {'columnName': 'Title', 'width': '60', 'label': _('Title')},
                      ],
       ),
     ),
+
+
+    ComputedField(
+        'ImputationUID',
+        searchable=True,
+        expression='here.getImputation().UID()',        
+	widget=ComputedWidget(
+            visible=True,
+        ),
+    ),
+    
 
     DateTimeField(
         'BatchDate',
@@ -167,6 +186,15 @@ schema = BikaFolderSchema.copy() + Schema((
         required=False,
 	widget=DateTimeWidget(
             label=_('Date limit for Publication'),
+	    size=40,
+        ),
+    ),
+
+    DateTimeField(
+        'BatchDateLimitStock',
+        required=False,
+	widget=DateTimeWidget(
+            label=_('Date limit for Stock'),
 	    size=40,
         ),
     ),
@@ -330,20 +358,10 @@ class Batch(ATFolder):
 	#pdb.set_trace()
         client = self.Schema().getField('Client').get(self)
 	if client:
-	    print "call me "+client.UID()
 	    return client
         client = self.aq_parent
-	print "call me "+client.UID()
 	if IClient.providedBy(client):
             return client
-
-
-    def dynamicBaseQuery(self):
-	print "===================="
-	client=self.getClient().UID()
-	your_json= '["ClientUID": "self.getClient().UID()"]'
-	# i tried {"ClientUID": "self.getClient().UID()"} it give same error
-	return json.loads(your_json)
 
 
     def getClientTitle(self):

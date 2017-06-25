@@ -143,7 +143,7 @@ class AnalysisRequestsView(BikaListingView):
             'state_title': {'title': _('State'),
                             'index': 'review_state'},
             'getProfilesTitle': {'title': _('Profile'),
-                                'index': 'getProfilesTitle',
+                                'index': 'Title',
                                 'toggle': False},
             'getAnalysesNum': {'title': _('Number of Analyses'),
                                'index': 'getAnalysesNum',
@@ -748,8 +748,9 @@ class AnalysisRequestsView(BikaListingView):
         item['replace']['getSample'] = \
             "<a href='%s'>%s</a>" % (sample.absolute_url(), sample.Title())
 
-        item['replace']['getProfilesTitle'] = ", ".join(
-            [p.Title() for p in obj.getProfiles()])
+	item['replace']['getProfilesTitle'] = obj.getProfiles()
+       # item['replace']['getProfilesTitle'] = ", ".join(
+        #    [p.Title() for p in obj.getProfiles()])
 
         analysesnum = obj.getAnalysesNum()
         if analysesnum:

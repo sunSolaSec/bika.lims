@@ -17,8 +17,10 @@ class ReferenceWidgetVocabulary(DefaultReferenceWidgetVocabulary):
     def __call__(self):
         base_query = json.loads(self.request['base_query'])
         portal_type = base_query.get('portal_type', [])
-        if 'Contact' in portal_type:
+	if 'Contact' in portal_type:
             base_query['getParentUID'] = [self.context.UID(), ]
+	elif 'Imputation' in portal_type:
+	    base_query['ClientUID'] = [self.context.UID(), ]
         self.request['base_query'] = json.dumps(base_query)
         return DefaultReferenceWidgetVocabulary.__call__(self)
 

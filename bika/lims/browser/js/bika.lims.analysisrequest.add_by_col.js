@@ -476,6 +476,7 @@
       arnum = get_arnum(element);
       fieldname = $(element).parents('[fieldname]').attr('fieldname');
       value = $(element).val();
+      console("change from slect " + $(element).val());
       state_set(arnum, fieldname, value);
     };
     select_element_change = function() {
@@ -702,6 +703,7 @@
         var arnum;
         arnum = get_arnum(this);
         cc_contacts_set(arnum);
+        filter_by_client(arnum);
       });
     };
     cc_contacts_set = function(arnum) {
@@ -2332,9 +2334,10 @@
         include_fields: ['Title', 'UID', 'ContactUID', 'Contact', 'Imputation', 'ImputationUID', 'CContact']
       };
       window.bika.lims.jsonapi_read(request_data, function(data) {
-        var c, i, im, nr_ars, spec, to_disable;
+        var c, i, im, spec, to_disable;
         if (data.objects.length > 0) {
           spec = data.objects[0];
+          console.info("imp " + spec['ImputationUID']);
           c = $('input[id^="Batch"]');
           c.attr('uid', spec['UID']).val(spec['Title']).attr('uid_check', spec).attr('val_check', spec['Title']).attr('disabled', 'disabled');
           $('[id^="Contact-"][id$="_uid"]').val(spec['Batch']);
@@ -2344,16 +2347,9 @@
           im = $('input[id^="Imputation"]');
           im.attr('uid', spec['ImputationUID']).val(spec['Imputation']).attr('uid_check', spec).attr('val_check', spec['Imputation']).attr('disabled', 'disabled');
           $('[id^="Contact-"][id$="_uid"]').val(spec['Imputation']);
-          i = 0;
-          nr_ars = parseInt($('input[id="ar_count"]').val(), 10);
-          while (i < nr_ars) {
-            console.info("in");
-            state_set(i, 'Impuation', spec['ImputationUID']);
-            cc_contacts_set(i);
-            i++;
-          }
+          cc_contacts_set_imp();
           im = $('input[id^="CCContact"]');
-          to_disable = ['SamplingRound', 'Template', 'SamplingDeviation', 'SampleCondition', 'EnvironmentConditions', 'InvoiceInclude', 'SamplePoint', 'Sample', 'Batch', 'SubGroup', 'SamplingDate', 'Composite', 'DefaultContainerType', 'AdHoc'];
+          to_disable = ['SamplingRound', 'Template', 'SamplingDeviation', 'SampleCondition', 'EnvironmentConditions', 'InvoiceInclude', 'SamplePoint', 'Sample', 'Batch', 'SubGroup', 'Composite', 'DefaultContainerType', 'AdHoc'];
           i = 0;
           while (to_disable.length > i) {
             $('tr[fieldname="' + to_disable[i] + '"]').hide();
@@ -2362,7 +2358,7 @@
         }
       });
     };
-    cc_contacts_set_imp = function(arnum) {
+    cc_contacts_set_imp = function() {
 
       /* Setting the CC Contacts after a Imp was set
        *
@@ -2370,14 +2366,11 @@
        * So we need to select them in the form with some fakey html,
        * and set them in the state.
        */
-      var cc_div, cc_uid_element, imputation_element, imputation_uid, request_data, td;
+      var imputation_element, imputation_uid, request_data, td;
       td = $('tr[fieldname=\'Imputation\']');
       imputation_element = $(td).find('input[type=\'text\']')[0];
       imputation_uid = $(imputation_element).attr('uid');
-      cc_div = $('tr[fieldname=\'CCContact\'] td[arnum=\'' + arnum + '\'] .multiValued-listing');
-      cc_uid_element = $('#CCContact-' + arnum + '_uid');
-      $(cc_div).empty();
-      $(cc_uid_element).empty();
+      console.info("set_cccontact_imp  " + imputation_uid);
       if (imputation_uid) {
         request_data = {
           catalog_name: 'portal_catalog',
@@ -2386,27 +2379,62 @@
           UID: imputation_uid
         };
         window.bika.lims.jsonapi_read(request_data, function(data) {
-          var cc_titles, del_btn, del_btn_src, i, l, new_item, ob, title, uid;
+          var arnum, cc_div, cc_profile, cc_titles, cc_uid_element, del_btn, del_btn_src, element, i, l, new_item, nr_ars, ob, title, uid, uids;
           if (data.objects && data.objects.length > 0) {
+            nr_ars = parseInt($('input[id="ar_count"]').val(), 10);
+            console.debug("Initializing for " + nr_ars + " ARs");
+            arnum = 0;
             ob = data.objects[0];
-            cc_titles = ob['cccontacts'];
+            cc_profile = ob['aprofil'];
+            console.info("aprofil" + cc_profile.length);
             i = 0;
-            if (!cc_titles) {
+            if (!cc_profile) {
               return;
             }
-            l = [];
-            while (i <= cc_titles.length / 2) {
-              title = cc_titles[i][0];
-              uid = cc_titles[i][1];
-              del_btn_src = window.portal_url + '/++resource++bika.lims.images/delete.png';
-              del_btn = '<img class=\'deletebtn\' data-contact-title=\'' + title + '\' src=\'' + del_btn_src + '\' fieldname=\'CCContact\' uid=\'' + uid + '\'/>';
-              new_item = '<div class=\'reference_multi_item\' uid=\'' + uid + '\'>' + del_btn + title + '</div>';
-              $(cc_div).append($(new_item));
-              l.push(cc_titles[i][1]);
-              i++;
+            uids = [];
+            if (cc_profile.length !== 0) {
+              while (i < cc_profile.length) {
+                uid = cc_profile[i][1];
+                uids.push(cc_profile[i][1]);
+                console.info('l=' + uids[i]);
+                i++;
+              }
             }
-            console.info("state changed");
-            state_set(arnum, 'CCContact', l.join(','));
+            element = $('tr[fieldname=Profiles] td[arnum=' + arnum + '] input')[0];
+            filter_combogrid(element, 'UID', uids);
+            while (arnum < nr_ars) {
+              cc_div = $('tr[fieldname=\'CCContact\'] td[arnum=\'' + arnum + '\'] .multiValued-listing');
+              cc_uid_element = $('#CCContact-' + arnum + '_uid');
+              $(cc_div).empty();
+              $(cc_uid_element).empty();
+              cc_titles = ob['cccontacts'];
+              cc_profile = ob['aprofil'];
+              console.info("title:" + cc_titles);
+              console.info("aprofil" + cc_profile);
+              element = $('tr[fieldname=Profiles] td[arnum=' + arnum + '] input')[0];
+              filter_combogrid(element, 'UID', uids);
+              console.info("AR " + arnum);
+              i = 0;
+              if (!cc_titles) {
+                return;
+              }
+              l = [];
+              if (cc_titles.length !== 0) {
+                while (i < cc_titles.length) {
+                  title = cc_titles[i][0];
+                  uid = cc_titles[i][1];
+                  del_btn_src = window.portal_url + '/++resource++bika.lims.images/delete.png';
+                  del_btn = '<img class=\'deletebtn\' data-contact-title=\'' + title + '\' src=\'' + del_btn_src + '\' fieldname=\'CCContact\' uid=\'' + uid + '\'/>';
+                  new_item = '<div class=\'reference_multi_item\' uid=\'' + uid + '\'>' + del_btn + title + '</div>';
+                  $(cc_div).append($(new_item));
+                  l.push(cc_titles[i][1]);
+                  i++;
+                }
+                state_set(arnum, 'CCContact', l.join(','));
+              }
+              arnum++;
+            }
+            console.info("end set_cccontact_imp");
           }
         });
       }

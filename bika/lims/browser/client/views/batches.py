@@ -19,7 +19,7 @@ class ClientBatchesView(BikaListingView):
         self.catalog = 'bika_catalog'
         self.contentFilter = {
             'portal_type': 'Batch',
-            'sort_on': 'created',
+	    'sort_on': 'created',
             'sort_order': 'reverse',
             'cancellation_state': 'active',
 	     'path': {

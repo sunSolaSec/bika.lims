@@ -206,8 +206,10 @@ window.AnalysisRequestAddByCol = ->
 
     arnum_i = parseInt(arnum, 10)
     if fieldname and value != undefined
-      # console.log("arnum=" + arnum + ", fieldname=" + fieldname + ", value=" + value)
+      #console.log("arnum=" + arnum + ", fieldname=" + fieldname + ", value=" + value)
       bika.lims.ar_add.state[arnum_i][fieldname] = value
+      #console.log('changed :'+bika.lims.ar_add.state[arnum_i][fieldname])
+      
     return
 
 
@@ -312,6 +314,12 @@ window.AnalysisRequestAddByCol = ->
     #  querytype can be 'base_query' or 'search_query'.
     ###
 
+    #console.info("element:============>"+element)
+    #console.info("filterkey:============>"+filterkey)
+    #console.info("filtervalue:============>"+filtervalue)
+    #console.info("querytype:============>"+querytype)
+
+    
     if !$(element).is(':visible')
       return
     if !querytype
@@ -372,8 +380,10 @@ window.AnalysisRequestAddByCol = ->
       uid
       $('#bika_setup').attr('bika_analysisprofiles_uid')
     ]
+    #console.info("AR:============>"+uids[1]+"==")
     element = $('tr[fieldname=Profiles] td[arnum=' + arnum + '] input')[0]
     filter_combogrid element, 'getClientUID', uids
+
     uids = [
       uid
       $('#bika_setup').attr('bika_analysisspecs_uid')
@@ -554,6 +564,7 @@ window.AnalysisRequestAddByCol = ->
     arnum = get_arnum(element)
     fieldname = $(element).parents('[fieldname]').attr('fieldname')
     value = $(element).val()
+    console("change from slect "+$(element).val())
     state_set arnum, fieldname, value
     return
 
@@ -791,6 +802,7 @@ window.AnalysisRequestAddByCol = ->
     $('tr[fieldname="Contact"] input[type="text"]').live 'selected copy', (event, item) ->
       arnum = get_arnum(this)
       cc_contacts_set arnum
+      filter_by_client arnum
       return
     # We do not trigger copy event on load for Contact because doing so would
     # clear any default value supplied for the CCContact field.
@@ -2535,8 +2547,9 @@ window.AnalysisRequestAddByCol = ->
 
     window.bika.lims.jsonapi_read request_data, (data) ->
       if data.objects.length > 0
+        
         spec = data.objects[0]
-  
+        console.info("imp "+spec['ImputationUID'])
     # Selecting the Batch
         c = $('input[id^="Batch"]')
         # Filling out and halting Batch fields
@@ -2557,28 +2570,11 @@ window.AnalysisRequestAddByCol = ->
 
 
     # Filling out CContacts
-        i=0
-        nr_ars = parseInt($('input[id="ar_count"]').val(), 10)
-        while i<nr_ars
-          console.info("in")
-          state_set i, 'Impuation', spec['ImputationUID']
-          cc_contacts_set i
-          i++
+        cc_contacts_set_imp()
         im = $('input[id^="CCContact"]')
-        #im.attr 'disabled', 'disabled'
 
-    # Filling out AP
-	###
-        #uid = $($('tr[fieldname=\'Client\'] td[arnum=\'' + arnum + '\'] input')[0]).attr('uid')
-        #uids = [
-        #       uid
-        #       $('#bika_setup').attr('bika_analysisprofiles_uid')
-        #    ]
-    	#element = $('tr[fieldname=Profiles] td[arnum=' + arnum + '] input')[0]
-    	#filter_combogrid element, 'getClientUID', uids
-	###
-  
-        # Hiding all fields which depends on the sampling round
+   
+        #im.attr 'disabled', 'disabled'
         to_disable = [
           'SamplingRound'
           'Template'
@@ -2590,21 +2586,19 @@ window.AnalysisRequestAddByCol = ->
           'Sample'
           'Batch'
           'SubGroup'
-          'SamplingDate'
           'Composite'
           'DefaultContainerType'
           'AdHoc'
         ]
         i = 0
-        while to_disable.length > i
+        while to_disable.length > i        
           $('tr[fieldname="' + to_disable[i] + '"]').hide()
           i++
-  
-      return
-    return
+       return
+     return
 
 
-  cc_contacts_set_imp = (arnum) ->
+  cc_contacts_set_imp =->
 
     ### Setting the CC Contacts after a Imp was set
     #
@@ -2616,13 +2610,8 @@ window.AnalysisRequestAddByCol = ->
     td = $('tr[fieldname=\'Imputation\']')
     imputation_element = $(td).find('input[type=\'text\']')[0]
     imputation_uid = $(imputation_element).attr('uid')
-    #console.info("cc_imp_uid  #{imputation_uid}")
+    console.info("set_cccontact_imp  #{imputation_uid}")
 
-    # clear the CC selector widget and listing DIV
-    cc_div = $('tr[fieldname=\'CCContact\'] td[arnum=\'' + arnum + '\'] .multiValued-listing')
-    cc_uid_element = $('#CCContact-' + arnum + '_uid')
-    $(cc_div).empty()
-    $(cc_uid_element).empty()
 
     if imputation_uid
       request_data =
@@ -2635,31 +2624,78 @@ window.AnalysisRequestAddByCol = ->
           'cccontacts'
         ]
         UID: imputation_uid
+
       
       window.bika.lims.jsonapi_read request_data, (data) ->
         if data.objects and data.objects.length > 0
+
+          nr_ars = parseInt($('input[id="ar_count"]').val(), 10)
+          console.debug "Initializing for #{nr_ars} ARs"
+          arnum = 0
+
+
+       #filter AP according to imp
           ob = data.objects[0]
-          cc_titles = ob['cccontacts']
-          
+          cc_profile= ob['aprofil']
+          console.info("aprofil"+cc_profile.length)
           i = 0
-          if !cc_titles
-            return
-          l=[]
-          while i <= cc_titles.length/2
-            title = cc_titles[i][0]
-            uid = cc_titles[i][1]
-            #$(cc_uid_element).val cc_titles[i].join(',')
+          if !cc_profile
+                return
+          uids=[]
+          if cc_profile.length!=0
+                while i < cc_profile.length
+                  uid = cc_profile[i][1]
+                  uids.push(cc_profile[i][1])
+                  console.info('l='+uids[i])
+                  i++
 
-            del_btn_src = window.portal_url + '/++resource++bika.lims.images/delete.png'
-            del_btn = '<img class=\'deletebtn\' data-contact-title=\'' + title + '\' src=\'' + del_btn_src + '\' fieldname=\'CCContact\' uid=\'' + uid + '\'/>'
-            new_item = '<div class=\'reference_multi_item\' uid=\'' + uid + '\'>' + del_btn + title + '</div>'
-            $(cc_div).append $(new_item)
-            l.push(cc_titles[i][1])
-            i++
+          element = $('tr[fieldname=Profiles] td[arnum=' + arnum + '] input')[0]
+          filter_combogrid element, 'UID', uids
 
-          console.info("state changed")
-          state_set arnum, 'CCContact', l.join(',')
-          
+
+
+        #filter CContact according to imp
+
+          while arnum < nr_ars
+
+              # clear the CC selector widget and listing DIV
+              cc_div = $('tr[fieldname=\'CCContact\'] td[arnum=\'' + arnum + '\'] .multiValued-listing')
+              cc_uid_element = $('#CCContact-' + arnum + '_uid')
+              $(cc_div).empty()
+              $(cc_uid_element).empty()
+
+              cc_titles = ob['cccontacts']
+              cc_profile= ob['aprofil']
+              console.info("title:"+cc_titles)
+              console.info("aprofil"+cc_profile)
+
+              #filter AP
+              element = $('tr[fieldname=Profiles] td[arnum=' + arnum + '] input')[0]
+              filter_combogrid element, 'UID', uids
+      
+              
+              console.info("AR "+arnum)
+              
+              i = 0
+              if !cc_titles
+                return
+              l=[]
+              if cc_titles.length!=0
+                while i < cc_titles.length
+                  title = cc_titles[i][0]
+                  uid = cc_titles[i][1]
+                  #$(cc_uid_element).val cc_titles[i].join(',')
+
+                  del_btn_src = window.portal_url + '/++resource++bika.lims.images/delete.png'
+                  del_btn = '<img class=\'deletebtn\' data-contact-title=\'' + title + '\' src=\'' + del_btn_src + '\' fieldname=\'CCContact\' uid=\'' + uid + '\'/>'
+                  new_item = '<div class=\'reference_multi_item\' uid=\'' + uid + '\'>' + del_btn + title + '</div>'
+                  $(cc_div).append $(new_item)
+                  l.push(cc_titles[i][1])
+                  i++
+                state_set arnum, 'CCContact', l.join(',')
+              arnum++
+              
+          console.info("end set_cccontact_imp")
         return
     return
 
@@ -2736,3 +2772,4 @@ window.AnalysisRequestAddByCol = ->
     return
 
   return
+

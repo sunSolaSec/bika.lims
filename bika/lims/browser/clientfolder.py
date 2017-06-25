@@ -167,7 +167,7 @@ class ClientFolderContentsView(BikaListingView):
         if 'bika.lims.client.default_landing_page' in registry:
             landing_page = registry['bika.lims.client.default_landing_page']
         else:
-            landing_page = 'analysisrequests'
+            landing_page = 'batches'
 
         for item in items:
             if "obj" not in item:
