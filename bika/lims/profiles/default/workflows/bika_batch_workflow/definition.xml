@@ -77,10 +77,6 @@
     <exit-transition transition_id="receive" />
     <exit-transition transition_id="cancel" />
     <permission-map name="BIKA: Add Analysis Request" acquired="False">
-      <permission-role>LabClerk</permission-role>
-      <permission-role>LabManager</permission-role>
-      <permission-role>Manager</permission-role>
-      <permission-role>Client</permission-role>
     </permission-map>
     <permission-map name="BIKA: Close Batch" acquired="False">
       <permission-role>LabClerk</permission-role>
@@ -128,10 +124,6 @@
     <description>The batch can be edited and Analysis Requests can be attached</description>
     <exit-transition transition_id="publish" />
     <permission-map name="BIKA: Add Analysis Request" acquired="False">
-      <permission-role>LabClerk</permission-role>
-      <permission-role>LabManager</permission-role>
-      <permission-role>Manager</permission-role>
-      <permission-role>Client</permission-role>
     </permission-map>
     <permission-map name="BIKA: Close Batch" acquired="False">
       <permission-role>LabClerk</permission-role>
@@ -181,10 +173,6 @@
     <exit-transition transition_id="close" />
     <exit-transition transition_id="republish" />
     <permission-map name="BIKA: Add Analysis Request" acquired="False">
-      <permission-role>LabClerk</permission-role>
-      <permission-role>LabManager</permission-role>
-      <permission-role>Manager</permission-role>
-      <permission-role>Client</permission-role>
     </permission-map>
     <permission-map name="BIKA: Close Batch" acquired="False">
       <permission-role>LabClerk</permission-role>
@@ -236,6 +224,9 @@
     <permission-map name="BIKA: Close Batch" acquired="False">
     </permission-map>
     <permission-map name="BIKA: Edit Batch" acquired="False">
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
     </permission-map>
     <permission-map name="BIKA: Reopen Batch" acquired="False">
       <permission-role>LabClerk</permission-role>

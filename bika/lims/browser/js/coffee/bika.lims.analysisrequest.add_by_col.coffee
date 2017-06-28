@@ -2549,7 +2549,7 @@ window.AnalysisRequestAddByCol = ->
       if data.objects.length > 0
         
         spec = data.objects[0]
-        console.info("imp "+spec['ImputationUID'])
+        console.info("imp "+spec['Imputation'])
     # Selecting the Batch
         c = $('input[id^="Batch"]')
         # Filling out and halting Batch fields

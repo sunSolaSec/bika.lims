@@ -132,10 +132,10 @@ schema = BikaFolderSchema.copy() + Schema((
                       ],
         ),
     ),
-
+    
     ComputedField(
         'ContactUID',
-        searchable=True,
+        searchable=False,
         expression='here.getContact().UID()',        
 	widget=ComputedWidget(
             visible=True,
@@ -162,7 +162,7 @@ schema = BikaFolderSchema.copy() + Schema((
 
     ComputedField(
         'ImputationUID',
-        searchable=True,
+        searchable=False,
         expression='here.getImputation().UID()',        
 	widget=ComputedWidget(
             visible=True,

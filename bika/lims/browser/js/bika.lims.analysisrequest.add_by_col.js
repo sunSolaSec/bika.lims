@@ -2337,7 +2337,7 @@
         var c, i, im, spec, to_disable;
         if (data.objects.length > 0) {
           spec = data.objects[0];
-          console.info("imp " + spec['ImputationUID']);
+          console.info("imp " + spec['Imputation']);
           c = $('input[id^="Batch"]');
           c.attr('uid', spec['UID']).val(spec['Title']).attr('uid_check', spec).attr('val_check', spec['Title']).attr('disabled', 'disabled');
           $('[id^="Contact-"][id$="_uid"]').val(spec['Batch']);

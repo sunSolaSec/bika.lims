@@ -33,6 +33,9 @@ class AnalysisRequestsView(_ARV, _ARAV):
     def __call__(self):
         self.context_actions = {}
         mtool = getToolByName(self.context, 'portal_membership')
+	print str(mtool.checkPermission(AddAnalysisRequest, self.portal))+"===================="+str(self.portal)
+	#print "===================="+self.State
+       
         if mtool.checkPermission(AddAnalysisRequest, self.portal):
             self.context_actions[self.context.translate(_('Add new'))] = {
                 'url': self.context.absolute_url() + \

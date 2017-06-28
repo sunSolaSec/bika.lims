@@ -67,7 +67,8 @@ class ClientAnalysisProfilesView(BikaListingView):
         mtool = getToolByName(self.context, 'portal_membership')
         checkPermission = mtool.checkPermission
         if checkPermission(AddAnalysisProfile, self.context):
-            self.context_actions[_('Add')] = \
+            self.context_actions = {
+            _('Add'):
                 {'url': 'createObject?type_name=AnalysisProfile',
-                 'icon': '++resource++bika.lims.images/add.png'}
+                 'icon': '++resource++bika.lims.images/add.png'}}
         return super(ClientAnalysisProfilesView, self).__call__()
