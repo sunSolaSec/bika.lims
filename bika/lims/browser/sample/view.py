@@ -48,14 +48,14 @@ class SamplesView(BikaListingView):
                                        'level': 0 }
                               }
         # So far we will only print if the sampling workflow is activated
-        if self.context.bika_setup.getSamplingWorkflowEnabled():
-            self.context_actions = {
+        #if self.context.bika_setup.getSamplingWorkflowEnabled():
+        self.context_actions = {
                 _('Print sample sheets'): {
                     'url': 'print_sampling_sheets',
                     'icon': '++resource++bika.lims.images/print_32.png'}
                     }
-        else:
-                self.context_actions = {}
+        #else:
+                #self.context_actions = {}
         self.show_sort_column = False
         self.show_select_row = False
         self.show_select_column = True
@@ -116,6 +116,11 @@ class SamplesView(BikaListingView):
                                'toggle': SamplingWorkflowEnabled,
                                'input_class': 'datetimepicker_nofuture autosave',
                                'input_width': '10'},
+            'Quantity': {'title': _('first Quantity'),
+                               'index':'getQuantity',
+                               'toggle': SamplingWorkflowEnabled,
+                               'input_class': 'datetimepicker_nofuture autosave',
+                               'input_width': '10'},
             'getSampler': {'title': _('Sampler'),
                            'toggle': SamplingWorkflowEnabled},
             'getScheduledSamplingSampler': {
@@ -156,6 +161,7 @@ class SamplesView(BikaListingView):
                          'SamplingDate',
                          'getScheduledSamplingSampler',
                          'DateSampled',
+                         'Quantity',
                          'getSampler',
                          'getDatePreserved',
                          'getPreserver',
@@ -176,6 +182,7 @@ class SamplesView(BikaListingView):
                          'SamplingDate',
                          'getScheduledSamplingSampler',
                          'DateSampled',
+                         'Quantity',
                          'getSampler',
                          'getPreserver',
                          'getSampleTypeTitle',
@@ -201,6 +208,7 @@ class SamplesView(BikaListingView):
                          'getScheduledSamplingSampler',
                          'getScheduledSamplingSampler',
                          'DateSampled',
+                         'Quantity',
                          'getSampler',
                          'getDatePreserved',
                          'getPreserver',
@@ -228,12 +236,36 @@ class SamplesView(BikaListingView):
                          'SamplingDeviation',
                          'AdHoc',
                          'SamplingDate',
+                         'Quantity',
                          'getScheduledSamplingSampler',
                          'DateSampled',
                          'getSampler',
                          'getDatePreserved',
                          'getPreserver',
                          'DateReceived']},
+	        {'id': 'sample_prep',
+             'title': _('To be prepared'),
+             'contentFilter': {'review_state': ('sample_prep'),
+                               'cancellation_state': 'active',
+                               'sort_on': 'created',
+                               'sort_order': 'reverse'},
+             'columns': ['getSampleID',
+                         'Client',
+                         'Requests',
+                         'getClientReference',
+                         'getClientSampleID',
+                         'SamplingDate',
+                         'getScheduledSamplingSampler',
+                         'DateSampled',
+                         'Quantity',
+                         'getSampler',
+                         'getPreserver',
+                         'getSampleTypeTitle',
+                         'getSamplePointTitle',
+                         'state_title'],
+             'transitions': [
+                {'id': 'sample'}],
+             },
             {'id':'expired',
              'title': _('Expired'),
              'contentFilter':{'review_state':'expired',
@@ -252,6 +284,7 @@ class SamplesView(BikaListingView):
                          'SamplingDeviation',
                          'AdHoc',
                          'SamplingDate',
+                        'Quantity',
                          'getScheduledSamplingSampler',
                          'DateSampled',
                          'getSampler',
@@ -276,6 +309,7 @@ class SamplesView(BikaListingView):
                          'SamplingDeviation',
                          'AdHoc',
                          'SamplingDate',
+                         'Quantity',
                          'getScheduledSamplingSampler',
                          'DateSampled',
                          'getSampler',
@@ -304,6 +338,7 @@ class SamplesView(BikaListingView):
                          'getScheduledSamplingSampler',
                          'DateReceived',
                          'DateSampled',
+                         'Quantity',
                          'getSampler',
                          'getDatePreserved',
                          'getPreserver',
@@ -329,6 +364,7 @@ class SamplesView(BikaListingView):
                          'getSamplingDate',
                          'DateReceived',
                          'getDateSampled',
+                         'Quantity',
                          'getSampler',
                          'getDatePreserved',
                          'getPreserver',
@@ -388,8 +424,7 @@ class SamplesView(BikaListingView):
         if after_icons:
             item['after']['getSampleID'] = after_icons
 
-        SamplingWorkflowEnabled =\
-            self.context.bika_setup.getSamplingWorkflowEnabled()
+        SamplingWorkflowEnabled =obj.getSamplingWorkflow()
 
         if SamplingWorkflowEnabled and (not sd or not sd > DateTime()):
             datesampled = self.ulocalized_time(

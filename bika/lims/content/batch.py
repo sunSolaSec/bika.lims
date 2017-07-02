@@ -486,27 +486,27 @@ class Batch(ATFolder):
 
     def workflow_guard_send(self):
         #TODO
-        print "submit batch"
+        #print "submit batch"
         return True
    
     def workflow_guard_receive(self):
        #TODO
-       print "receive batch"
+       #print "receive batch"
        return True
 
     def workflow_guard_receive_prepublish(self):
  	#TODO
-       print "prepublish batch"
+       #print "prepublish batch"
        return True
 
     def workflow_guard_prepublish(self):
  	#TODO
-       print "prepublish batch"
+       #print "prepublish batch"
        return True
    
     def guard_cancelled_object(self):
        #TODO
-       print "cancel to prepub"
+       #print "cancel to prepub"
        return True
 
     def workflow_guard_close(self):

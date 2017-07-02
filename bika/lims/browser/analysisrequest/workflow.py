@@ -252,6 +252,7 @@ class AnalysisRequestWorkflowAction(WorkflowAction):
         self.request.response.redirect(self.destination_url)
 
     def workflow_action_receive(self):
+	#print "receive new AR"
         action, came_from = WorkflowAction._get_form_workflow_action(self)
         items = [self.context,] if came_from == 'workflow_action' \
                 else self._get_selected_items().values()

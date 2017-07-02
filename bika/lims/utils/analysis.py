@@ -19,8 +19,12 @@ from bika.lims.utils import formatDecimalMark
 
 def create_analysis(context, service, keyword, interim_fields):
     # Determine if the sampling workflow is enabled
-    workflow_enabled = context.bika_setup.getSamplingWorkflowEnabled()
+    #workflow_enabled = context.bika_setup.getSamplingWorkflowEnabled()
+    workflow_enabled = context.getSamplingWorkflow()
+    #print 'The contexte in utils/analysis :'+str(context.getSamplingWorkflow())
+    workflow_enabled =True
     # Create the analysis
+    
     analysis = _createObjectByType("Analysis", context, keyword)
     analysis.setService(service)
     analysis.setInterimFields(interim_fields)

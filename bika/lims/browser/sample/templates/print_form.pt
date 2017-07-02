@@ -36,7 +36,7 @@
                 </div>
                 <div class='options-line'>
                     <label i18n:translate="">Margins (mm)</label>
-                    top: <input class='option-margin' id="margin-top" type="text"/>&nbsp;
+                    top: <input class='option-margin' id="margin-top" type="text" value=0/>&nbsp;
                     right: <input class='option-margin' id="margin-right" type="text"/>&nbsp;
                     bottom: <input class='option-margin' id="margin-bottom" type="text"/>&nbsp;
                     left: <input class='option-margin' id="margin-left" type="text"/>

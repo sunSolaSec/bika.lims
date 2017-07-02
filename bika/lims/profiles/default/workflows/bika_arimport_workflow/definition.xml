@@ -9,6 +9,7 @@
              i18n:domain="bika">
 
   <permission>Modify portal content</permission>
+  <permission> View </permission>
 
   <state state_id="imported" title="Imported"  i18n:attributes="title">
     <exit-transition transition_id="" />
@@ -22,6 +23,16 @@
       <permission-role>LabClerk</permission-role>
       <permission-role>LabManager</permission-role>
       <permission-role>Manager</permission-role>
+    </permission-map>
+    <permission-map name="View" acquired="False">
+      <permission-role>Analyst</permission-role>
+      <permission-role>Client</permission-role>
+      <permission-role>LabClerk</permission-role>
+      <permission-role>LabManager</permission-role>
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>RegulatoryInspector</permission-role>
+      <permission-role>Verifier</permission-role>
     </permission-map>
   </state>
 

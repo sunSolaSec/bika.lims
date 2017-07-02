@@ -22,6 +22,7 @@
     <span class="documentFirstHeading" tal:content="structure view/title"/>
     </h1>
 
+    <br/><br/>
     <div class="worksheet_add_controls" tal:condition="python:view.isManagementAllowed()">
         <form name="worksheet-add-form" action="worksheet_add" method="POST">
 
@@ -51,8 +52,6 @@
                 </tal:options>
             </select>
         </span>
-
-        <br/>
 
         <span class="context_action_dropdown">
             <select name = "template"
@@ -87,10 +86,14 @@
                 class python:'context_action_link %s' % (view.context_actions[add_item].get('class',''))"/>
         </tal:add_actions>
 
+        <br/><br/>
+
         </form>
     </div>
     <fieldset/> <!-- just for styling -->
 </metal:content-title>
+
+<br/><br/>
 
 <metal:content-core fill-slot="content-core">
     <div id="folderlisting-main-table"

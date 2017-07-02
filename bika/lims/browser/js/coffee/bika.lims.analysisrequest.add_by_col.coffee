@@ -51,6 +51,7 @@ window.AnalysisRequestAddByCol = ->
 
     while arnum < nr_ars
       bika.lims.ar_add.state[arnum] = 'Analyses': []
+      state_set arnum, 'SamplingWorkflow', false
       arnum++
 
     # Remove "required" attribute; we will manage this manually, later.
@@ -1353,6 +1354,20 @@ window.AnalysisRequestAddByCol = ->
     $(td).find('input[id$=\'_uid\']').val ''
     return
 
+
+  SamplingWorkflow_selected = ->
+    $('tr[fieldname=\'SamplingWorkflow\'] td[arnum] input[type=\'checkbox\']').live('click copy', (event) ->
+      arnum = get_arnum(this)
+      if $(this).prop('checked')
+         state_set arnum, 'SamplingWorkflow', true
+      else
+         state_set arnum, 'SamplingWorkflow', false
+      return
+    ).each (i, e) ->
+      # trigger copy on form load
+      $(e).trigger 'copy'
+      return
+    return
 
   drymatter_selected = ->
     $('tr[fieldname=\'ReportDryMatter\'] td[arnum] input[type=\'checkbox\']').live('click copy', (event) ->
@@ -2749,6 +2764,7 @@ window.AnalysisRequestAddByCol = ->
     profile_unset_trigger()
     template_selected()
     drymatter_selected()
+    SamplingWorkflow_selected()
     sample_selected()
     singleservice_dropdown_init()
     singleservice_deletebtn_click()

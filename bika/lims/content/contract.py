@@ -37,7 +37,7 @@ class IContract(model.Schema):
 	doc = NamedBlobFile(
                 title=_(u"documentation"),
                 description=_(u""),
-                required=False
+                required=True
                 )
 
 class Contract(Container):

@@ -51,7 +51,9 @@ def create_samplepartition(context, data, analyses=[]):
     partition = _createObjectByType('SamplePartition', context, data['part_id'])
     partition.unmarkCreationFlag()
     # Determine if the sampling workflow is enabled
-    workflow_enabled = context.bika_setup.getSamplingWorkflowEnabled()
+    workflow_enabled = context.getSamplingWorkflow()
+    #print 'The contexte in utils/samplePartition :'+str(context.getSamplingWorkflow())
+    
     # Sort containers and select smallest
     container = data.get('container_uid', None)
     if container:

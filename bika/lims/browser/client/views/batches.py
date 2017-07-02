@@ -8,6 +8,8 @@ from bika.lims.browser import BrowserView
 from zope.interface import implements
 import plone
 import json
+from bika.lims.permissions import *
+from Products.CMFCore.utils import getToolByName
 
 
 class ClientBatchesView(BikaListingView):
@@ -19,19 +21,13 @@ class ClientBatchesView(BikaListingView):
         self.catalog = 'bika_catalog'
         self.contentFilter = {
             'portal_type': 'Batch',
-	    'sort_on': 'created',
-            'sort_order': 'reverse',
             'cancellation_state': 'active',
 	     'path': {
                 "query": "/".join(context.getPhysicalPath()),
                 "level": 0
             }
         }
-	self.context_actions = {
-            _('Add'):
-                {'url': 'createObject?type_name=Batch',
-                 'icon': '++resource++bika.lims.images/add.png'}}
-
+	
         self.icon = self.portal_url + "/++resource++bika.lims.images/batch_big.png"
         self.title = self.context.translate(_("Batches"))
         self.description = ""
@@ -131,6 +127,14 @@ class ClientBatchesView(BikaListingView):
 
     def __call__(self):
         #print "call ClientBatchesView call() "
+	mtool = getToolByName(self.context, 'portal_membership')
+	print "permission to add batch:"+str(mtool.checkPermission(AddBatch, self.context))
+	if mtool.checkPermission(AddBatch, self.context):
+		self.context_actions = {
+		    _('Add'):
+		        {'url': 'createObject?type_name=Batch',
+		         'icon': '++resource++bika.lims.images/add.png'}}
+
         return super(ClientBatchesView, self).__call__()
 
     def isItemAllowed(self, obj):

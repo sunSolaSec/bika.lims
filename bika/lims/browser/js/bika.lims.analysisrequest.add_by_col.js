@@ -27,7 +27,7 @@
      * filter_by_client - Grab the client UID and filter all applicable dropdowns
      * get_arnum(element) - convenience to compensate for different form layouts.
      */
-    var _partition_indicators_set, analysis_cb_after_change, analysis_cb_check, analysis_cb_click, analysis_cb_uncheck, category_header_clicked, category_header_expand_handler, cc_contacts_deletebtn_click, cc_contacts_set, cc_contacts_set_imp, checkbox_change, checkbox_change_handler, client_selected, composite_selected, contact_selected, copybutton_selected, dependancies_add_yes, dependants_remove_confirm, dependants_remove_no, dependants_remove_yes, dependencies_add_confirm, dependencies_add_no, deps_calc, destroy, drymatter_selected, drymatter_set, drymatter_unset, expand_services_bika_listing, expand_services_singleservice, filter_by_client, filter_combogrid, fix_table_layout, form_init, form_submit, from_batch, from_sampling_round, get_arnum, hash_to_hashes, hashes_to_hash, partition_indicators_set, partnrs_calc, profile_selected, profile_set, profile_unset_trigger, profiles_unset_all, recalc_prices, referencewidget_change, referencewidget_change_handler, rejectionwidget_change, rejectionwidget_change_handler, sample_selected, sample_set, samplepoint_selected, samplepoint_set, sampletype_selected, sampletype_set, select_element_change, select_element_change_handler, set_spec_from_sampletype, set_state_from_form_values, setupBatchInfo, setupSamplingRoundInfo, singleservice_deletebtn_click, singleservice_dropdown_init, singleservice_duplicate, spec_field_entry, spec_filter_on_sampletype, spec_selected, specification_apply, specification_refetch, state_analyses_push, state_analyses_remove, state_set, template_selected, template_set, template_unset, textarea_change, textarea_change_handler, textinput_change, textinput_change_handler, that, uncheck_all_services, unset_profile_analysis_services;
+    var SamplingWorkflow_selected, _partition_indicators_set, analysis_cb_after_change, analysis_cb_check, analysis_cb_click, analysis_cb_uncheck, category_header_clicked, category_header_expand_handler, cc_contacts_deletebtn_click, cc_contacts_set, cc_contacts_set_imp, checkbox_change, checkbox_change_handler, client_selected, composite_selected, contact_selected, copybutton_selected, dependancies_add_yes, dependants_remove_confirm, dependants_remove_no, dependants_remove_yes, dependencies_add_confirm, dependencies_add_no, deps_calc, destroy, drymatter_selected, drymatter_set, drymatter_unset, expand_services_bika_listing, expand_services_singleservice, filter_by_client, filter_combogrid, fix_table_layout, form_init, form_submit, from_batch, from_sampling_round, get_arnum, hash_to_hashes, hashes_to_hash, partition_indicators_set, partnrs_calc, profile_selected, profile_set, profile_unset_trigger, profiles_unset_all, recalc_prices, referencewidget_change, referencewidget_change_handler, rejectionwidget_change, rejectionwidget_change_handler, sample_selected, sample_set, samplepoint_selected, samplepoint_set, sampletype_selected, sampletype_set, select_element_change, select_element_change_handler, set_spec_from_sampletype, set_state_from_form_values, setupBatchInfo, setupSamplingRoundInfo, singleservice_deletebtn_click, singleservice_dropdown_init, singleservice_duplicate, spec_field_entry, spec_filter_on_sampletype, spec_selected, specification_apply, specification_refetch, state_analyses_push, state_analyses_remove, state_set, template_selected, template_set, template_unset, textarea_change, textarea_change_handler, textinput_change, textinput_change_handler, that, uncheck_all_services, unset_profile_analysis_services;
     form_init = function() {
 
       /* load-time form configuration
@@ -48,6 +48,7 @@
         bika.lims.ar_add.state[arnum] = {
           'Analyses': []
         };
+        state_set(arnum, 'SamplingWorkflow', false);
         arnum++;
       }
       elements = $('input[type!=\'hidden\']').not('[disabled]');
@@ -1215,6 +1216,19 @@
       td = $('tr[fieldname=\'Template\'] td[arnum=\'' + arnum + '\']');
       $(td).find('input[type=\'text\']').val('').attr('uid', '');
       $(td).find('input[id$=\'_uid\']').val('');
+    };
+    SamplingWorkflow_selected = function() {
+      $('tr[fieldname=\'SamplingWorkflow\'] td[arnum] input[type=\'checkbox\']').live('click copy', function(event) {
+        var arnum;
+        arnum = get_arnum(this);
+        if ($(this).prop('checked')) {
+          state_set(arnum, 'SamplingWorkflow', true);
+        } else {
+          state_set(arnum, 'SamplingWorkflow', false);
+        }
+      }).each(function(i, e) {
+        $(e).trigger('copy');
+      });
     };
     drymatter_selected = function() {
       $('tr[fieldname=\'ReportDryMatter\'] td[arnum] input[type=\'checkbox\']').live('click copy', function(event) {
@@ -2469,6 +2483,7 @@
       profile_unset_trigger();
       template_selected();
       drymatter_selected();
+      SamplingWorkflow_selected();
       sample_selected();
       singleservice_dropdown_init();
       singleservice_deletebtn_click();

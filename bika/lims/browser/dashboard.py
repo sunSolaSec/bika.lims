@@ -124,6 +124,7 @@ class DashboardView(BrowserView):
         """
         out = []
         sampenabled = self.context.bika_setup.getSamplingWorkflowEnabled()
+        print 'context browser/dashboarad:'+str(self.context)
         filtering_allowed=self.context.bika_setup.getAllowDepartmentFiltering()
         cookie_dep_uid= self.request.get('filter_by_department_info', '').split(',') if filtering_allowed else ''
 

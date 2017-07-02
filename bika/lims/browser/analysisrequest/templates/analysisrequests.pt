@@ -48,7 +48,6 @@
 	$(document).ready(function(){
 		$('input.ar_count').change(function(){
 			p1= $(".context_action_link").attr('href').split("&");
-			console.error('==============================================');
 			if(p1.length==1){
 				  p2=$(".context_action_link").attr('href').split("?");
 				  if(p2.length==1){

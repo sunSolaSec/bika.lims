@@ -14,12 +14,16 @@ def create_sample(context, request, values):
     # Retrieve the required tools
     uc = getToolByName(context, 'uid_catalog')
     # Determine if the sampling workflow is enabled
-    workflow_enabled = context.bika_setup.getSamplingWorkflowEnabled()
+    #workflow_enabled = context.bika_setup.getSamplingWorkflowEnabled()
+    workflow_enabled = values['SamplingWorkflow']
+    print 'The contexte in utils/sample :'+str(values['SamplingWorkflow'])
+    
     # Create sample or refer to existing for secondary analysis request
     if values.get('Sample_uid', ''):
         sample = uc(UID=values['Sample'])[0].getObject()
     else:
         sample = _createObjectByType('Sample', context, tmpID())
+        sample.setSamplingWorkflow(workflow_enabled)
         # Specifically set the sample type
         sample.setSampleType(values['SampleType'])
         # Specifically set the sample point

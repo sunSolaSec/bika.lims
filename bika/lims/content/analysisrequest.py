@@ -601,6 +601,7 @@ schema = BikaSchema.copy() + Schema((
             render_own_label=True,
         ),
     ),
+    
     # Sample field
     StringField(
         'Sampler',
@@ -1201,7 +1202,7 @@ schema = BikaSchema.copy() + Schema((
         read_permission=permissions.View,
         write_permission=permissions.ModifyPortalContent,
         widget=BooleanWidget(
-            label=_("Ad-Hoc"),
+            label=_("Ad--Hoc"),
             render_own_label=True,
             visible={
                 'edit': 'visible',
@@ -1593,6 +1594,84 @@ schema = BikaSchema.copy() + Schema((
             render_own_label=True,
         ),
     ),
+
+    # For comments or results interpretation
+    # Old one, to be removed because of the incorporation of
+    # ResultsInterpretationDepts (due to LIMS-1628)
+    TextField(
+        'ResultsInterpretation',
+        searchable=True,
+        mode="rw",
+        default_content_type='text/html',
+        # Input content type for the textfield
+        default_output_type='text/x-html-safe',
+        # getResultsInterpretation returns a str with html tags
+        # to conserve the txt format in the report.
+        read_permission=permissions.View,
+        write_permission=permissions.ModifyPortalContent,
+        widget=RichWidget(
+            description=_("Comments or results interpretation"),
+            label=_("Results Interpretation"),
+            size=10,
+            allow_file_upload=False,
+            default_mime_type='text/x-rst',
+            output_mime_type='text/x-html',
+            rows=3,
+            visible=False),
+    ),
+    RecordsField('ResultsInterpretationDepts',
+                 subfields=('uid',
+                            'richtext'),
+                 subfield_labels={'uid': _('Department'),
+                                  'richtext': _('Results Interpreation')},
+                 widget=RichWidget(visible=False),
+                 ),
+    # Custom settings for the assigned analysis services
+    # https://jira.bikalabs.com/browse/LIMS-1324
+    # Fields:
+    #   - uid: Analysis Service UID
+    #   - hidden: True/False. Hide/Display in results reports
+    RecordsField('AnalysisServicesSettings',
+                 required=0,
+                 subfields=('uid', 'hidden',),
+                 widget=ComputedWidget(visible=False),
+                 ),
+    
+    BooleanField(
+        'SamplingWorkflow',
+        default=False,
+        mode="rw",
+        read_permission=permissions.View,
+        write_permission=permissions.ModifyPortalContent,
+        widget=BooleanWidget(
+            label=_("Enable the Sampling workflow"),
+            render_own_label=True,
+            visible={
+                'edit': 'visible',
+                'view': 'visible',
+                'add':  {'view': 'visible', 'edit': 'visible'},
+                'secondary': 'disabled',
+                'header_table': 'visible',
+                'sample_registered':
+                    {'view': 'visible', 'edit': 'visible', 'add': 'edit'},
+                'to_be_sampled': {'view': 'visible', 'edit': 'invisible'},
+                'scheduled_sampling': {'view': 'visible', 'edit': 'invisible'},
+                'sampled': {'view': 'visible', 'edit': 'invisible'},
+                'to_be_preserved': {'view': 'visible', 'edit': 'invisible'},
+                'sample_due': {'view': 'visible', 'edit': 'invisible'},
+                'sample_prep': {'view': 'visible', 'edit': 'invisible'},
+                'sample_received': {'view': 'visible', 'edit': 'invisible'},
+                'attachment_due': {'view': 'visible', 'edit': 'invisible'},
+                'to_be_verified': {'view': 'visible', 'edit': 'invisible'},
+                'verified': {'view': 'visible', 'edit': 'invisible'},
+                'published': {'view': 'visible', 'edit': 'invisible'},
+                'invalid': {'view': 'visible', 'edit': 'invisible'},
+                'rejected': {'view': 'visible', 'edit': 'invisible'},
+            },
+        ),
+    ),
+
+    
     HistoryAwareReferenceField(
         'Priority',
         allowed_types=('ARPriority',),
@@ -1640,48 +1719,6 @@ schema = BikaSchema.copy() + Schema((
             showOn=True,
         ),
     ),
-
-    # For comments or results interpretation
-    # Old one, to be removed because of the incorporation of
-    # ResultsInterpretationDepts (due to LIMS-1628)
-    TextField(
-        'ResultsInterpretation',
-        searchable=True,
-        mode="rw",
-        default_content_type='text/html',
-        # Input content type for the textfield
-        default_output_type='text/x-html-safe',
-        # getResultsInterpretation returns a str with html tags
-        # to conserve the txt format in the report.
-        read_permission=permissions.View,
-        write_permission=permissions.ModifyPortalContent,
-        widget=RichWidget(
-            description=_("Comments or results interpretation"),
-            label=_("Results Interpretation"),
-            size=10,
-            allow_file_upload=False,
-            default_mime_type='text/x-rst',
-            output_mime_type='text/x-html',
-            rows=3,
-            visible=False),
-    ),
-    RecordsField('ResultsInterpretationDepts',
-                 subfields=('uid',
-                            'richtext'),
-                 subfield_labels={'uid': _('Department'),
-                                  'richtext': _('Results Interpreation')},
-                 widget=RichWidget(visible=False),
-                 ),
-    # Custom settings for the assigned analysis services
-    # https://jira.bikalabs.com/browse/LIMS-1324
-    # Fields:
-    #   - uid: Analysis Service UID
-    #   - hidden: True/False. Hide/Display in results reports
-    RecordsField('AnalysisServicesSettings',
-                 required=0,
-                 subfields=('uid', 'hidden',),
-                 widget=ComputedWidget(visible=False),
-                 ),
 )
 )
 
@@ -1709,6 +1746,12 @@ class AnalysisRequest(BaseFolder):
     schema = schema
 
     _at_rename_after_creation = True
+
+    def getSamplingWorkflow(self):
+        print self.SamplingWorkflow
+        return self.SamplingWorkflow
+        
+        return True
 
     def _renameAfterCreation(self, check_auto_id=False):
         from bika.lims.idserver import renameAfterCreation
@@ -2024,11 +2067,14 @@ class AnalysisRequest(BaseFolder):
             if review_state != 'not_requested':
                 analyses.append(analysis)
         # Getting all profiles
-        analysis_profiles = self.getProfiles() if len(
-            self.getProfiles()) > 0 else []
+        #analysis_profiles = self.getProfiles() if len(
+        #    self.getProfiles()) > 0 else []
+	analysis_profiles = self.getProfiles()
+        #    self.getProfiles()) > 0 else []
         # Cleaning services included in profiles
-        for profile in analysis_profiles:
-            for analysis_service in profile.getService():
+        #for profile in analysis_profiles:
+	profile=analysis_profiles
+        for analysis_service in self.getProfiles().getService():
                 for analysis in analyses:
                     if analysis_service.getKeyword() == analysis.getService(
 
@@ -2736,8 +2782,7 @@ class AnalysisRequest(BaseFolder):
         # Created by using an AR Profile?
         if not sets and self.getProfiles():
             adv = []
-            adv += [profile.getAnalysisServiceSettings(uid) for profile in
-                    self.getProfiles()]
+            adv += [self.getProfiles().getAnalysisServiceSettings(uid)]
             sets = adv if 'hidden' in adv[0] else []
 
         return sets[0] if sets else {'uid': uid}

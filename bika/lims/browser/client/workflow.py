@@ -205,7 +205,8 @@ class ClientWorkflowAction(AnalysisRequestWorkflowAction):
                     its.append(uid);
             its = ",".join(its)
             q = "/publish?items=" + its
-            dest = self.portal_url+"/analysisrequests" + q
+            #dest = self.portal_url+"/analysisrequests" + q   batches
+            dest = self.portal_url+"/batches" + q 
             self.request.response.redirect(dest)
 
         else:

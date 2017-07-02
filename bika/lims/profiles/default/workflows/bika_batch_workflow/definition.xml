@@ -25,10 +25,6 @@
     <exit-transition transition_id="close" />
     <exit-transition transition_id="send" />
     <permission-map name="BIKA: Add Analysis Request" acquired="False">
-      <permission-role>LabClerk</permission-role>
-      <permission-role>LabManager</permission-role>
-      <permission-role>Manager</permission-role>
-      <permission-role>Client</permission-role>
     </permission-map>
     <permission-map name="BIKA: Close Batch" acquired="False">
       <permission-role>LabClerk</permission-role>

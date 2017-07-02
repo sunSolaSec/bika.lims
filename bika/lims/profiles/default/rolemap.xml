@@ -7,6 +7,7 @@
     <role name="LabManager"/>
     <role name="Member"/>
     <role name="Preserver"/>
+    <role name="Preperator"/>
     <role name="Publisher"/>
     <role name="RegulatoryInspector"/>
     <role name="Reviewer"/>
@@ -28,6 +29,7 @@
       <role name="Manager"/>
       <role name="Owner"/>
       <role name="Sampler"/>
+      <role name="Preserver"/>
     </permission>
 
     <permission name="BIKA: Add AnalysisProfile" acquire="True">
@@ -38,10 +40,7 @@
     </permission>
 
     <permission name="BIKA: Add Analysis Request" acquire="True">
-      <role name="LabClerk"/>
-      <role name="LabManager"/>
-      <role name="Manager"/>
-      <role name="Owner"/>
+      
     </permission>
 
     <permission name="BIKA: Add AnalysisSpec" acquire="True">
@@ -64,9 +63,11 @@
       <role name="LabManager"/>
       <role name="Manager"/>
       <role name="Sampler"/>
+      <role name="Preserver"/>
     </permission>
 
     <permission name="BIKA: Add Batch" acquire="True">
+      <role name="Client"/>
       <role name="LabClerk"/>
       <role name="LabManager"/>
       <role name="Manager"/>
@@ -111,6 +112,7 @@
       <role name="Manager"/>
       <role name="Owner"/>
       <role name="Sampler"/>
+      <role name="Preserver"/>
     </permission>
 
     <permission name="BIKA: Add SampleMatrix" acquire="True">
@@ -127,6 +129,7 @@
       <role name="Owner"/>
       <role name="Sampler"/>
       <role name="SamplingCoordinator"/>
+      <role name="Preserver"/>
     </permission>
 
     <permission name="BIKA: Add SamplePoint" acquire="True">
@@ -134,6 +137,7 @@
       <role name="LabManager"/>
       <role name="Manager"/>
       <role name="Owner"/>
+      <role name="Preserver"/>
     </permission>
 
     <permission name="BIKA: Add StorageLocation" acquire="True">
@@ -174,6 +178,7 @@
 
     <permission name="FTP access" acquire="True">
       <role name="Analyst"/>
+      <role name="Preperator"/>
       <role name="LabClerk"/>
       <role name="LabManager"/>
       <role name="Manager"/>
@@ -201,6 +206,7 @@
 
     <permission name="CMFEditions: Apply version control" acquire="True">
       <role name="Analyst"/>
+      <role name="Preperator"/>
       <role name="LabClerk"/>
       <role name="LabManager"/>
       <role name="Manager"/>
@@ -210,6 +216,7 @@
 
     <permission name="CMFEditions: Save new version" acquire="True">
       <role name="Analyst"/>
+      <role name="Preperator"/>
       <role name="LabClerk"/>
       <role name="LabManager"/>
       <role name="Manager"/>
@@ -219,6 +226,7 @@
 
     <permission name="CMFEditions: Access previous versions" acquire="True">
       <role name="Analyst"/>
+      <role name="Preperator"/>
       <role name="LabClerk"/>
       <role name="LabManager"/>
       <role name="Manager"/>
@@ -254,6 +262,8 @@
       <role name="RegulatoryInspector"/>
       <role name="Sampler"/>
       <role name="SamplingCoordinator"/>
+      <role name="Preserver"/>
+      <role name="Preperator"/>
     </permission>
 
     <permission name="BIKA: Manage Bika" acquire="True">
@@ -296,6 +306,8 @@
       <role name="RegulatoryInspector"/>
       <role name="Sampler"/>
       <role name="SamplingCoordinator"/>
+      <role name="Preperator"/>
+      <role name="Preperator"/>
     </permission>
 
     <permission name="BIKA: Manage Worksheets" acquire="True">
@@ -324,6 +336,7 @@
     <permission name="BIKA: Schedule Sampling" acquire="False">
       <role name="Manager"/>
       <role name="SamplingCoordinator"/>
+      <role name="Preserver"/>
     </permission>
 
     <permission name="BIKA: Sample Sample" acquire="False">
@@ -413,6 +426,7 @@
       <role name="Analyst"/>
       <role name="LabManager"/>
       <role name="Manager"/>
+      <role name="Preperator"/>
     </permission>
 
     <permission name="BIKA: Results not requested" acquire="True">

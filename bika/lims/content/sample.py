@@ -260,15 +260,11 @@ schema = BikaSchema.copy() + Schema((
             showOn=True,
         ),
     ),
-    BooleanField(
-        'SamplingWorkflowEnabled',
-        default_method='getSamplingWorkflowEnabledDefault'
-    ),
     DateTimeField(
         'DateSampled',
         mode="rw",
         read_permission=permissions.View,
-        write_permission=SampleSample,
+        write_permission=permissions.ModifyPortalContent,
         widget=DateTimeWidget(
             label=_("Date Sampled"),
             show_time=True,
@@ -360,7 +356,7 @@ schema = BikaSchema.copy() + Schema((
                 'header_table': 'visible',
                 'sample_registered': {'view': 'visible', 'edit': 'visible'},
                 'to_be_sampled': {'view': 'visible', 'edit': 'visible'},
-                'scheduled_sampling': {'view': 'visible', 'edit': 'visible'},
+                'scheduled_sampling': {'view': 'invisible', 'edit': 'invisible'},
                 'sampled': {'view': 'visible', 'edit': 'invisible'},
                 'to_be_preserved': {'view': 'visible', 'edit': 'invisible'},
                 'sample_due': {'view': 'visible', 'edit': 'invisible'},
@@ -641,22 +637,23 @@ schema = BikaSchema.copy() + Schema((
         read_permission=permissions.View,
         write_permission=permissions.ModifyPortalContent,
         widget=BooleanWidget(
-            label=_("Ad-Hoc"),
-            visible={
-                'edit': 'visible',
-                'view': 'visible',
-                'header_table': 'visible',
-                'sample_registered': {'view': 'visible', 'edit': 'visible'},
-                'to_be_sampled': {'view': 'visible', 'edit': 'visible'},
-                'scheduled_sampling': {'view': 'visible', 'edit': 'visible'},
-                'sampled': {'view': 'visible', 'edit': 'visible'},
-                'to_be_preserved': {'view': 'visible', 'edit': 'visible'},
-                'sample_due': {'view': 'visible', 'edit': 'visible'},
-                'sample_received': {'view': 'visible', 'edit': 'visible'},
-                'expired': {'view': 'visible', 'edit': 'invisible'},
-                'disposed': {'view': 'visible', 'edit': 'invisible'},
-                'rejected': {'view': 'visible', 'edit': 'invisible'},
-            },
+            label=_("Ad---Hoc"),
+            #visible={
+            #    'edit': 'visible',
+            #    'view': 'visible',
+             #   'header_table': 'visible',
+             #   'sample_registered': {'view': 'visible', 'edit': 'visible'},
+             #   'to_be_sampled': {'view': 'visible', 'edit': 'visible'},
+             #   'scheduled_sampling': {'view': 'visible', 'edit': 'visible'},
+             #   'sampled': {'view': 'visible', 'edit': 'visible'},
+             #   'to_be_preserved': {'view': 'visible', 'edit': 'visible'},
+             #   'sample_due': {'view': 'visible', 'edit': 'visible'},
+             #   'sample_received': {'view': 'visible', 'edit': 'visible'},
+             #   'expired': {'view': 'visible', 'edit': 'invisible'},
+             #   'disposed': {'view': 'visible', 'edit': 'invisible'},
+             #   'rejected': {'view': 'visible', 'edit': 'invisible'},
+            #},
+            visible=False,
             render_own_label=True,
         ),
     ),
@@ -710,6 +707,61 @@ schema = BikaSchema.copy() + Schema((
     #         render_own_label=False,
     #     ),
     # ),
+    BooleanField(
+        'SamplingWorkflow',
+        default=False,
+        mode="rw",
+        read_permission=permissions.View,
+        write_permission=permissions.ModifyPortalContent,
+        widget=BooleanWidget(
+            label=_("Enable the Sampling workflow"),
+            description=_("Select this to activate the sample collection workflow steps."),
+            visible={
+                'edit': 'invisible',
+                'view': 'visible',
+                'header_table': 'visible',
+                'sample_registered': {'view': 'visible', 'edit': 'visible','add':'visible'},
+                'to_be_sampled': {'view': 'visible', 'edit': 'visible'},
+                'scheduled_sampling': {'view': 'visible', 'edit': 'visible'},
+                'sampled': {'view': 'visible', 'edit': 'visible'},
+                'to_be_preserved': {'view': 'visible', 'edit': 'visible'},
+                'sample_due': {'view': 'visible', 'edit': 'visible'},
+                'sample_received': {'view': 'visible', 'edit': 'visible'},
+                'expired': {'view': 'visible', 'edit': 'invisible'},
+                'disposed': {'view': 'visible', 'edit': 'invisible'},
+                'rejected': {'view': 'visible', 'edit': 'invisible'},
+            },
+            render_own_label=True,
+        ),
+    ),
+
+    StringField(
+        'Quantity',
+        mode="rw",
+        read_permission=permissions.View,
+        write_permission=SampleSample,
+        widget=StringWidget(
+            label=_("quantity"),
+            show_time=True,
+            size=20,
+            visible={'edit': 'visible',
+                     'view': 'visible',
+                     'header_table': 'visible',
+                     'sample_registered': {'view': 'invisible', 'edit': 'invisible'},
+                     'to_be_sampled': {'view': 'visible', 'edit': 'visible'},
+                     'scheduled_sampling': {'view': 'visible', 'edit': 'visible'},
+                     'sampled': {'view': 'visible', 'edit': 'invisible'},
+                     'to_be_preserved': {'view': 'visible', 'edit': 'invisible'},
+                     'sample_due': {'view': 'visible', 'edit': 'invisible'},
+                     'sample_received': {'view': 'visible', 'edit': 'invisible'},
+                     'expired': {'view': 'visible', 'edit': 'invisible'},
+                     'disposed': {'view': 'visible', 'edit': 'invisible'},
+                     'rejected': {'view': 'visible', 'edit': 'invisible'},
+                     },
+            render_own_label=True,
+        ),
+    ),
+    
 ))
 
 
@@ -740,8 +792,11 @@ class Sample(BaseFolder, HistoryAwareMixin):
         """ Return the Sample ID as title """
         return self.getSampleID()
 
-    def getSamplingWorkflowEnabledDefault(self):
-        return self.bika_setup.getSamplingWorkflowEnabled()
+    
+    def setSamplingWorkflow(self,value):
+        print self.getSamplingWorkflow()
+        self.Schema()['AdHoc'].set(self, value)
+        
 
     def getContactTitle(self):
         return ""
@@ -1108,11 +1163,10 @@ class Sample(BaseFolder, HistoryAwareMixin):
             sp_review_state = wftool.getInfoFor(self, 'sampleprep_review_state')
             assert sp_review_state
         except WorkflowException as e:
-            logger.warn("guard_sample_prep_complete_transition: "
-                        "WorkflowException %s" % e)
+            #logger.warn("guard_sample_prep_complete_transition: "WorkflowException %s" % e)
             return False
         except AssertionError:
-            logger.warn("'%s': cannot get 'sampleprep_review_state'" % sp_wf_name)
+            #logger.warn("'%s': cannot get 'sampleprep_review_state'" % sp_wf_name)
             return False
 
         # get state from workflow - error = allow transition
@@ -1134,6 +1188,8 @@ class Sample(BaseFolder, HistoryAwareMixin):
            isBasicTransitionAllowed(self):
             return True
         return False
+
+	
 
 
 atapi.registerType(Sample, PROJECTNAME)

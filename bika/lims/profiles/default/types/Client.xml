@@ -143,7 +143,7 @@
          link_target=""
          url_expr="string:${object_url}/analysisspecs"
          i18n:attributes="title"
-         visible="False">
+         visible="True">
   <permission value="View"/>
  </action>
 

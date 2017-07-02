@@ -80,12 +80,12 @@ class SamplingWorkflowWidgetVisibility(object):
         self.sort = 100
 
     def __call__(self, context, mode, field, default):
-        sw_fields = ['Sampler', 'DateSampled']
+        sw_fields = ['Sampler', 'DateSampled','Quantity']
         state = default if default else 'invisible'
         fieldName = field.getName()
         if fieldName in sw_fields \
-                and hasattr(self.context, 'getSamplingWorkflowEnabled') \
-                and self.context.getSamplingWorkflowEnabled():
+                and hasattr(self.context, 'getSamplingWorkflow') \
+                and self.context.getSamplingWorkflow():
             if mode == 'header_table':
                 state = 'prominent'
             elif mode == 'view':

@@ -77,12 +77,16 @@ def create_analysisrequest(context, request, values, analyses=None,
     # Create new sample or locate the existing for secondary AR
     if not values.get('Sample', False):
         secondary = False
-        workflow_enabled = context.bika_setup.getSamplingWorkflowEnabled()
+        #workflow_enabled = context.bika_setup.getSamplingWorkflowEnabled()
         sample = create_sample(context, request, values)
+        workflow_enabled = values['SamplingWorkflow']
+        #print 'The contexte in utils/analysisRequest :'+str(values['SamplingWorkflow'])
+        
+    
     else:
         secondary = True
         sample = get_sample_from_values(context, values)
-        workflow_enabled = sample.getSamplingWorkflowEnabled()
+        workflow_enabled = sample.getSamplingWorkflow()
 
     # Create the Analysis Request
     ar = _createObjectByType('AnalysisRequest', context, tmpID())

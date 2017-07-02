@@ -316,6 +316,7 @@
   <state state_id="sample_received" title="Received" i18n:attributes="title">
     <description>Sample is 'in the lab'</description>
     <exit-transition transition_id="prepublish" />
+    <exit-transition transition_id="sample_prep" />
     <exit-transition transition_id="submit" />
     <permission-map name="BIKA: Add Analysis" acquired="False">
       <permission-role>LabClerk</permission-role>

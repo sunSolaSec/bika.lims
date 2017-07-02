@@ -1,6 +1,8 @@
 <!--
     Default Samples form template for Bika LIMS
 -->
+
+<br></br><br></br><br></br>
 <tal:form tal:define="samples python:view.getSortedFilteredSamples()">
     <div id="section-header" class='page-header'>
         <table class="header-form">
@@ -15,6 +17,7 @@
                 <div class="header-name" i18n:translate="">Samples print form</div>
             <th>
     </table>
+    
     </div>
     <!-- samples listed by Partition/Container -->
     <tal:data-entry
